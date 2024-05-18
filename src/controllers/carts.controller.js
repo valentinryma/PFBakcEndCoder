@@ -11,7 +11,6 @@ class CartsController {
 
     async getAll(_, res) {
         const carts = await this.service.getAll();
-        console.log('a')
         return res.json(carts);
     }
 
@@ -21,7 +20,7 @@ class CartsController {
         try {
             const cart = await this.service.getById(id);
             if (!cart) return res.status(404).json('Not found');
-            return cart
+            return res.json(cart);
 
         } catch (e) {
             return this.#handleError(res, e);
@@ -31,7 +30,7 @@ class CartsController {
     async createOne(_, res) {
         try {
             const emptyCart = await this.service.createOne();
-            res.json(emptyCart);
+            return res.json(emptyCart);
         } catch (e) {
             return this.#handleError(res, e);
         }
@@ -41,7 +40,7 @@ class CartsController {
         const id = req.params.id;
         try {
             const cartDelete = await this.service.deleteById(id);
-            res.json({ status: 'success', cartDelete });
+            return res.json({ status: 'success', cartDelete });
         } catch (e) {
             return this.#handleError(res, e);
         }
@@ -56,7 +55,7 @@ class CartsController {
 
         try {
             const cartUpdate = await this.service.addProductInCart(cid, product);
-            res.json({ status: 'success', cartUpdate })
+            return res.json({ status: 'success', cartUpdate })
         } catch (e) {
             return this.#handleError(res, e);
         }
