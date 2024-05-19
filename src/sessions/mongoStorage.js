@@ -1,17 +1,17 @@
 const MongoStore = require('connect-mongo')
 const session = require('express-session')
-const config = require(`${__dirname}/../config.js`);
+const config = require(`${__dirname}/../dot_config.js`);
 
-const { dbName, mongoUrl, secret, resave, saveUninitialized } = config
+const { dbName, mongoUrl, secret, resave, saveUninitialized, ttl } = config
 
 const storage = MongoStore.create({
     dbName,
     mongoUrl,
-    // ttl: 60
+    ttl
 })
 
 module.exports = session({
-    storage,
+    store: storage,
     secret,
     resave,
     saveUninitialized

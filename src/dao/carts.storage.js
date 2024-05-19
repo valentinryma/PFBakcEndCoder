@@ -24,21 +24,21 @@ class CartsStorage {
 
         } catch (e) {
             console.log(`Error en ${__dirname} - getAll`, e);
-            return { error: e.message }
+            throw new Error(e)
         }
     }
 
 
     async getById(id) {
         try {
-            const cart = await CartModel.findOne({ _id: id });
-            if (!cart) throw new Error('not found');
+            const cart = await CartModel.findOne({ _id: id }).lean().populate('products._id');
+            if (!cart) throw new Error('cart not found');
             // console.log(`Cart encontrado: ${cart}`);
             return cart;
 
         } catch (e) {
             console.log(`Error en ${__dirname} - getById`, e);
-            return { error: e.message }
+            throw new Error(e)
         }
     }
 
@@ -51,7 +51,7 @@ class CartsStorage {
 
         } catch (e) {
             console.log(`Error en ${__dirname} - createOne`, e);
-            return { error: e.message }
+            throw new Error(e)
         }
     }
 
@@ -60,14 +60,14 @@ class CartsStorage {
         try {
             const cartDelete = await CartModel.deleteOne({ _id: id });
             if (cartDelete.deletedCount == 0) {
-                throw new Error('not found');
+                throw new Error('cart not found');
             }
             // console.log(`Carrito eliminado: ${cartDelete}`);
             return cartDelete;
 
         } catch (e) {
             console.log(`Error en ${__dirname} - deleteById`, e);
-            return { error: e.message }
+            throw new Error(e)
         }
     }
 
@@ -76,50 +76,67 @@ class CartsStorage {
         const { pid, quantity } = product
 
         const cart = await CartModel.findOne({ _id: cid });
-        if (!cart) throw new Error('not found');
+        if (!cart) throw new Error('cart not found');
 
         const productToAdd = await ProductModel.findOne({ _id: pid });
-        if (!productToAdd) throw new Error('not found');
+        if (!productToAdd) throw new Error('product not found');
 
         // Verifica si el producto ya existe en el carrito.
-        let found = cart.products.find((product) => (product._id._id.toString() === pid));
+        let found = cart.products.find((product) => {
+            return (product._id._id.toString() === pid)
+        });
 
         // Actualiza el quantity del producto del carrito, si esta ya existe en el mismo.
         if (found) {
             product.quantity += found.quantity;
+
             try {
-                const cartUpdate = await CartModel.updateOne(
-                    { _id: id, 'products._id:': pid },
+                const cartUpdate = await CartModel.updateOne({ _id: cid, 'products._id': pid },
                     { $set: { 'products.$.quantity': product.quantity } }
-                );
-                // console.log(`Carrito actualizado: ${cartUpdate}`);
+                )
+
+                // console.log(`Carrito actualizado: ${await CartModel.findOne({ _id: cid })}`);
                 return cartUpdate;
 
             } catch (e) {
-                console.log(`Error en ${__dirname} - addProductInCart`, e);
-                return { error: e.message }
+                console.log(`Error en ${__dirname} - addProductInCart \n`, e);
+                throw new Error(e)
             }
         }
 
         try {
             // Agrega el producto en el carrito.
-            const cartUpdate = await CartModel.updateOne({ _id: id }, {
+            const cartUpdate = await CartModel.updateOne({ _id: cid }, {
                 $push: { products: { _id: pid, quantity } }
             });
+
             return cartUpdate;
 
         } catch (e) {
             console.log(`Error en ${__dirname} - addProductInCart`, e);
-            return { error: e.message }
+            throw new Error(e)
         }
     }
 
+    async deleteProductInCart(cid, pid) {
+        const cart = await CartModel.findOne({ _id: cid });
+        if (!cart) throw new Error('cart not found');
+
+        const product = await ProductModel.findOne({ _id: pid });
+        if (!product) throw new Error('product not found');
+
+        const cartUpdate = await CartModel.updateOne({ _id: cid }, {
+            $pull: { products: { _id: pid } }
+        })
+
+        return cartUpdate;
+    }
 
     // Pisa todos los productos del carrito con un array de productos | Sirve como clearCart (cid, [])
     async updateCartProductArray(cid, products) {
         try {
             const cart = await CartModel.findOne({ _id: cid });
-            if (!cart) throw new Error('not found');
+            if (!cart) throw new Error('cart not found');
 
             const cartUpdate = await CartModel.updateOne({ _id: cid }, {
                 $set: { products }
@@ -130,14 +147,14 @@ class CartsStorage {
 
         } catch (e) {
             console.log(`Error en ${__dirname} - updateCartProductArray`, e);
-            return { error: e.message }
+            throw new Error(e)
         }
     }
 
     // Retorna el numero total de productos dentro de un carrito (NO tiene en cuenta quantity.)
     async getTotalProducts(cid) {
         const cart = await CartModel.findOne({ _id: cid });
-        if (!cart) throw new Error('not found');
+        if (!cart) throw new Error('cart not found');
 
         try {
             const result = await CartModel.aggregate([ // Pipeline
@@ -156,7 +173,7 @@ class CartsStorage {
 
         } catch (error) {
             console.log(`Error en ${__dirname} - getTotalProducts`, e);
-            return { error: e.message }
+            throw new Error(e)
         }
     }
 
@@ -173,7 +190,7 @@ class CartsStorage {
 
         // Verifica la existencia del producto en el carrito
         const found = cart.products.find((product) => {
-            return (product.id).toString === pid;
+            return (product.id).toString() === pid;
         })
 
         if (!found) {
@@ -183,7 +200,7 @@ class CartsStorage {
 
         // Actualiza el quantity del producto
         try {
-            const cartUpdate = CartModel.updateOne({ _id: cid, 'products.$._id': pid }, {
+            const cartUpdate = await CartModel.updateOne({ _id: cid, 'products._id': pid }, {
                 $set: { 'products.$.quantity': newQuantity }
             })
 
@@ -192,7 +209,7 @@ class CartsStorage {
 
         } catch (e) {
             console.log(`Error en ${__dirname} - updateCartProductQuantity`, e);
-            return { error: e.message }
+            throw new Error(e)
         }
     }
 

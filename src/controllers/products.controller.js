@@ -1,12 +1,12 @@
 class ProductsController {
     constructor(service) {
-        this.service = service
+        this.service = service;
     }
 
     #handleError(res, e) {
-        if (e.message === 'invalid parameters') return res.status(400).json('Invalid parameters')
-        if (e.message === 'not found') return res.status(404).json('Not found')
-        return res.status(500).json({ error: e });
+        if (e.message === 'invalid parameters') return res.status(400).json('Invalid parameters');
+        if (e.message === 'not found') return res.status(404).json('Not found');
+        return res.status(500).json({ error: e.message });
     }
 
     async getAll(req, res) {

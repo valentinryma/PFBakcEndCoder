@@ -32,7 +32,7 @@ class ProductsStorage {
             return newProduct;
         } catch (e) {
             console.log(`Error en ${__dirname} - createOne`, e);
-            return { error: e.message }
+            throw new Error(e)
         }
     }
 
@@ -47,7 +47,7 @@ class ProductsStorage {
             return productDelete;
         } catch (e) {
             console.log(`Error en ${__dirname} - deleteById`, e);
-            return { error: e.message }
+            throw new Error(e)
         }
     }
 }

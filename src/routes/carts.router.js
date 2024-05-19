@@ -24,8 +24,9 @@ class CartRouter extends Router {
 
         // Delete
         this.delete('/:id', [PUBLIC], withController((controller, req, res) => controller.deleteById(req, res)))
+        this.delete('/:cid/product/:pid', [PUBLIC], withController((controller, req, res) => controller.deleteProductInCart(req, res)))
 
-        /// Put
+        // Put
         this.put('/:id/', [PUBLIC], withController((controller, req, res) => controller.updateCartProductArray(req, res)))
         this.put('/:cid/product/:pid', [PUBLIC], withController((controller, req, res) => controller.updateCartProductQuantity(req, res)))
     }

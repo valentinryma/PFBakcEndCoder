@@ -27,11 +27,16 @@ class CartsService {
         return await this.storage.addProductInCart(cid, product);
     }
 
+    async deleteProductInCart(cid, pid) {
+        return await this.storage.deleteProductInCart(cid, pid);
+    }
+
     async updateCartProductArray(cid, products) {
         return await this.storage.updateCartProductArray(cid, products); // products = [] => Limpia el carrito
     }
 
     async getTotalProducts(cid) {
+        if (cid === 'null') return 0;
         return await this.storage.getTotalProducts(cid);
     }
 

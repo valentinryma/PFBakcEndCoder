@@ -1,8 +1,4 @@
-# TO-DO:
-- [ ] addProductInCart: Verificar product._id._id
-- [ ] Custom response
-- [ ] Estandarizar mensajes de error / success
-- [ ] ver: getTotalProducts (/api/carts/:cid/total/products)
+Para inicializar el servidor una vez descargado el proyecto `cd src/`, luego `node app.js`
 
 ******
 # Endpoints
@@ -22,4 +18,15 @@
 
 ## *Products*:
 TODO
+
 ******
+
+# TO-DO:
+- [ ] Views: Ver como separar en capa
+- [ ] User:  router / controller / service / storage | view: /profile
+- [ ] Sessions: router / controller / service / storage
+- [ ] ver: getTotalProducts (/api/carts/:cid/total/products)
+- [ ] Custom response
+- [ ] Estandarizar mensajes de error / success
+
+{"cookie":{"originalMaxAge":null,"expires":null,"httpOnly":true,"path":"/"},"passport":{"user":"664a5c70db6a15f01754bd6b"}}

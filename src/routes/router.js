@@ -37,6 +37,8 @@ class BaseRouter {
                     return next();
                 }
             }
+
+            return res.json({ error: 'Not session' })
         }
     }
 

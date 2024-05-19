@@ -2,17 +2,19 @@ const express = require('express');
 const handlebars = require('express-handlebars');
 const mongoose = require('mongoose');
 const passport = require('passport');
+const cookieParser = require('cookie-parser');
 
 const config = require(`${__dirname}/dot_config.js`)
+
 const app = express();
 
 // Passport Config.
-// const initializeStrategyGitHub = require(`${__dirname}/config/passport-github.config.js`);
-// const initializeStrategyLocal = require(`${__dirname}/config/passport-local.config.js`);
-// const initializeStrategyJWT = require(`${__dirname}/config/passport-jwt.config.js`);
+const initializeStrategyJWT = require(`${__dirname}/config/passport-jwt.config.js`);
+const initializeStrategyLocal = require(`${__dirname}/config/passport-local.config.js`);
+const initializeStrategyGitHub = require(`${__dirname}/config/passport-github.config.js`);
 
-// // Sessions
-// const sessionMiddleware = require(`${__dirname}/session/mongoStorage.js`);
+// Sessions
+const sessionMiddleware = require(`${__dirname}/sessions/mongoStorage.js`);
 
 // Handlebars Config.
 app.engine('handlebars', handlebars.engine())
@@ -27,18 +29,18 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(`${__dirname}/../public`));
 
 // Mongo Session 
-// app.use(sessionMiddleware);
+app.use(sessionMiddleware);
 
 // Cookies
-// app.use(cookieParser());
+app.use(cookieParser());
 
 // Passport - Strategys
-// initializeStrategyGitHub();
-// initializeStrategyLocal();
-// initializeStrategyJWT();
+initializeStrategyGitHub();
+initializeStrategyLocal();
+initializeStrategyJWT();
 
-// app.use(passport.initialize())
-// app.use(passport.session())
+app.use(passport.initialize())
+app.use(passport.session())
 
 // Método de Persistencia - Storage
 const { ProductsStorage } = require(`${__dirname}/dao/products.storage.js`)
@@ -54,6 +56,8 @@ app.set('cart.storage', new CartsStorage());
 const routes = [
     require(`${__dirname}/routes/products.router.js`),
     require(`${__dirname}/routes/carts.router.js`),
+    require(`${__dirname}/routes/views.router.js`),
+    require(`${__dirname}/routes/sessions.router.js`),
 ];
 
 for (const route of routes) {

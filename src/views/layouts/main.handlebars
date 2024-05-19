@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script src="/assets/js/color-modes.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {{!-- Customs Styles --}}
+    {{#each styles}}
+    <link rel="stylesheet" href="/css/{{this}}">
+    {{/each}}
+
+    <title>{{title}}</title>
+</head>
+
+<body>
+    {{{body}}}
+
+    <!-- Custom scripts -->
+    {{#each scripts}}
+    <script src="/js/{{this}}"></script>
+    {{/each}}
+
+    {{!-- jquery --}}
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,60 @@
+<div>
+    <a href="/">Home</a>
+</div>
+{{#if isNotLoggedIn}}
+<div>
+    <p>Debe iniciar sesion para poder realizar una compra<span> <a href="/login">Iniciar sesion </a></span></p>
+</div>
+{{else}}
+<div>
+    <a href="/carts">Cart</a>
+</div>
+{{/if}}
+
+
+<div class="product-container">
+    {{#each results.payload}}
+    <div class="product">
+        <div class="product-details">
+            <h2 class="product-title">{{title}}</h2>
+            <p class="product-code">Code: {{code}}</p>
+            <p class="product-price">Price: ${{price}}</p>
+            <p class="product-stock">Stock: {{stock}}</p>
+            <p class="product-category">Category: {{category}}</p>
+
+            {{#if status}}
+            <p class="product-status">Status: Available ✔</p>
+
+            <div class="thumbnails">
+                {{#each thumbnails}}
+                <img src="{{this}}" alt="Thumbnail 1">
+                {{/each}}
+            </div>
+
+            {{#if ../isLoggedIn}}
+            <button class="btn-buy" id="{{_id}}.{{../cartId}}">BUY</button>
+            {{else}}
+            <button class="btn-buy-hide">User not logued</button>
+            {{/if}}
+
+            {{!-- Quantity --}}
+            {{else}}
+            <p class="product-status">Status: Not available ❌</p>
+            <button class="btn-buy-hide">Not available</button>
+            {{/if}}
+        </div>
+    </div>
+    <br>
+    {{/each}}
+
+    <div class="pagination">
+        Current page: {{results.page}}
+        {{#if results.hasPrevPage}}
+        <a href="/products?page={{results.prevPage}}&limit={{results.limit}}">Prev</a>
+        {{/if}}
+
+        {{#if results.hasNextPage}}
+        <a href="/products?page={{results.nextPage}}&limit={{results.limit}}">Next</a>
+        {{/if}}
+    </div>
+</div>

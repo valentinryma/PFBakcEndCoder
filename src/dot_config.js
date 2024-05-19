@@ -14,12 +14,16 @@ module.exports = {
 
     // GitHub - Private
     app_id: process.env.APP_ID,
-    client_id: process.env.CLIENT_ID,
-    client_secret: process.env.CLIENT_SECRET,
-    callback_url: process.env.CALLBACK_URL,
+    clientID: process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET,
+    callbackURL: process.env.CALLBACK_URL,
 
     // Mongo Storage
     secret: process.env.SECRET,
     resave: process.env.RESAVE,
     saveUninitialized: process.env.SAVE_UNITIALIZED,
+    ttl: process.env.TTL,
+
+    // JWT Config
+    jwt_secret: process.env.JWT_SECRET
 }
