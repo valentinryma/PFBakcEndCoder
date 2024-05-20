@@ -28,5 +28,4 @@ TODO
 - [ ] ver: getTotalProducts (/api/carts/:cid/total/products)
 - [ ] Custom response
 - [ ] Estandarizar mensajes de error / success
-
-{"cookie":{"originalMaxAge":null,"expires":null,"httpOnly":true,"path":"/"},"passport":{"user":"664a5c70db6a15f01754bd6b"}}
+- [ ] Revisar login with GitHub

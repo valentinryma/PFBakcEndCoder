@@ -35,9 +35,9 @@ app.use(sessionMiddleware);
 app.use(cookieParser());
 
 // Passport - Strategys
-initializeStrategyGitHub();
 initializeStrategyLocal();
 initializeStrategyJWT();
+initializeStrategyGitHub();
 
 app.use(passport.initialize())
 app.use(passport.session())
@@ -45,12 +45,12 @@ app.use(passport.session())
 // Método de Persistencia - Storage
 const { ProductsStorage } = require(`${__dirname}/dao/products.storage.js`)
 const { CartsStorage } = require(`${__dirname}/dao/carts.storage.js`)
-// const { UsersStorage } = require(`${__dirname}/dao/users.storage.js`)
+const { UsersStorage } = require(`${__dirname}/dao/users.storage.js`)
 
 // Instancias Storage (Globales - All request)
 app.set('product.storage', new ProductsStorage());
 app.set('cart.storage', new CartsStorage());
-// app.set('user.storage', new UsersStorage());
+app.set('user.storage', new UsersStorage());
 
 // Routers
 const routes = [

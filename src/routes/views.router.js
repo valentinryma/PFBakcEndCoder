@@ -1,17 +1,22 @@
 const Router = require(`${__dirname}/router.js`);
 const { PUBLIC, USER } = require(`${__dirname}/../config/policies.constants.js`);
+
 const { CartsService } = require(`${__dirname}/../services/carts.service.js`);
 const { ProductsService } = require(`${__dirname}/../services/products.service.js`);
+const { UsersService } = require(`${__dirname}/../services/users.service.js`);
 
 // TEMPORAL!
 const getAccess = (req) => {
     const cartStorage = req.app.get('cart.storage')
     const productStorage = req.app.get('product.storage')
+    const userStorage = req.app.get('user.storage');
 
     const cartAccess = new CartsService(cartStorage);
     const productAccess = new ProductsService(productStorage);
+    const usersAccess = new UsersService(userStorage);
 
-    return { cartAccess, productAccess }
+
+    return { cartAccess, productAccess, usersAccess }
 }
 
 class ViewsRouter extends Router {
@@ -59,10 +64,11 @@ class ViewsRouter extends Router {
             })
         })
 
+        // TODO
         this.get('/profile', [USER], async (req, res) => {
-            // TODO
+            const { usersAccess } = getAccess(req);
             const id = req.user.id
-            const user = await User.findOne({ _id: id });
+            const user = await usersAccess.getById(id);
 
             res.render('profile', {
                 title: 'My profile',
