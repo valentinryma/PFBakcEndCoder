@@ -1,4 +1,5 @@
 Para inicializar el servidor una vez descargado el proyecto `cd src/`, luego `node app.js`
+Ubicar archivo `.env` en `/src` (Misma ruta que el app y de donde se ejecutará node app.js)
 
 ******
 # Endpoints
