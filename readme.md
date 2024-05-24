@@ -23,10 +23,16 @@ TODO
 ******
 
 # TO-DO:
+- [ ] Middleware de autorización en conjunto con current
+    - admin: crear, actualizar y eliminar: productos
+    - user: enviar mensaje al chat
+    - user: agregar productos a su carrito 
+- [ ] Modelo Ticket
+- [ ] Ruta: /api/carts/:cid/purchase: Ver condiciones!.
+
 - [ ] Views: Ver como separar en capa
 - [ ] User:  router / controller / service / storage | view: /profile
 - [ ] Sessions: router / controller / service / storage
-- [ ] ver: getTotalProducts (/api/carts/:cid/total/products)
 - [ ] Custom response
 - [ ] Estandarizar mensajes de error / success
-- [ ] Revisar login with GitHub
+

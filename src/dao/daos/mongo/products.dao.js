@@ -1,7 +1,7 @@
 // Model
-const ProductModel = require(`${__dirname}/models/product.model.js`);
+const ProductModel = require(`${__dirname}/../../models/product.model.js`);
 
-class ProductsStorage {
+class ProductsMongoDAO {
     constructor() { }
 
     async prepare() {
@@ -52,4 +52,4 @@ class ProductsStorage {
     }
 }
 
-module.exports = { ProductsStorage };
+module.exports = { ProductsMongoDAO };

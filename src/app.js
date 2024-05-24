@@ -1,10 +1,12 @@
+// Procces.ENV
+require(`${__dirname}/dot_config.js`);
+process.env?.PORT && console.log('- Variables de entorno cargadas: ✔');
+
 const express = require('express');
 const handlebars = require('express-handlebars');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const cookieParser = require('cookie-parser');
-
-const config = require(`${__dirname}/dot_config.js`)
 
 const app = express();
 
@@ -42,16 +44,6 @@ initializeStrategyGitHub();
 app.use(passport.initialize())
 app.use(passport.session())
 
-// Método de Persistencia - Storage
-const { ProductsStorage } = require(`${__dirname}/dao/products.storage.js`)
-const { CartsStorage } = require(`${__dirname}/dao/carts.storage.js`)
-const { UsersStorage } = require(`${__dirname}/dao/users.storage.js`)
-
-// Instancias Storage (Globales - All request)
-app.set('product.storage', new ProductsStorage());
-app.set('cart.storage', new CartsStorage());
-app.set('user.storage', new UsersStorage());
-
 // Routers
 const routes = [
     require(`${__dirname}/routes/products.router.js`),
@@ -65,14 +57,19 @@ for (const route of routes) {
 }
 
 const main = async () => {
-    // Conexion DB
-    const { mongoUrl, dbName } = config
-    await mongoose.connect(mongoUrl, { dbName })
+    const persistence = process.env.PERSISTENCE || 'MONGO' // Default
+    if (persistence === 'MONGO') {
+        // Conexion DB
+        const mongoUrl = process.env.MONGO_URL;
+        const dbName = process.env.DB_NAME;
+
+        await mongoose.connect(mongoUrl, { dbName })
+    }
 
     // HTTP Server on.
-    const { PORT } = config || 8080
+    const PORT = process.env.PORT || 8080
     app.listen(PORT, () => {
-        console.log(`Sever on http://localhost:${PORT}/`);
+        console.log(`- Sever on http://localhost:${PORT}`);
     });
 };
 

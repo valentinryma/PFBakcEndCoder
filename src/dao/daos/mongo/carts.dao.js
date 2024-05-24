@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 
 // Models
-const CartModel = require(`${__dirname}/models/cart.model.js`);
-const ProductModel = require(`${__dirname}/models/product.model.js`);
+const CartModel = require(`${__dirname}/../../models/cart.model.js`);
+const ProductModel = require(`${__dirname}/../../models/product.model.js`);
 
-class CartsStorage {
+class CartsMongoDAO {
     constructor() { }
     async prepare() {
         if (CartModel.db.readyState != 1) {
@@ -214,4 +214,4 @@ class CartsStorage {
     }
 
 }
-module.exports = { CartsStorage }
+module.exports = { CartsMongoDAO }

@@ -1,4 +1,5 @@
 class CartsController {
+    // Service: repository.
     constructor(service) {
         this.service = service;
     }

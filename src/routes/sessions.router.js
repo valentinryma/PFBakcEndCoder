@@ -5,16 +5,30 @@ const { PUBLIC } = require(`${__dirname}/../config/policies.constants.js`);
 // TO-DO Mover a otra capa
 const { getURL } = require(`${__dirname}/../utils/utils.js`);
 const { generateToken } = require(`../utils/jwt.js`);
+const { UserDTO } = require('../dao/DTOs/users.dto.js');
+
+const { FactoryDAO } = require(`${__dirname}/../dao/factory.js`);
+const { UsersRepository } = require(`${__dirname}/../services/users.repository.js`);
+const { UsersController } = require(`${__dirname}/../controllers/users.controller.js`)
+
+const withController = (callback) => {
+    return (req, res) => {
+        const dao = new FactoryDAO().getUserDao();
+        const dto = UserDTO;
+
+        const repository = new UsersRepository(dao, dto);
+        const controller = new UsersController(repository);
+        return callback(controller, req, res);
+    }
+}
 
 class SessionsRouter extends Router {
     init() {
         // JWT
-        this.get('/current', [PUBLIC], passport.authenticate('jwt', { session: false }), (req, res) => {
-            res.sendSuccess({ user: req.user });
-        })
+        this.get('/current', [PUBLIC], withController((controller, req, res) => controller.getByIdFormat(req, res)))
 
         // Local: Register 
-        this.post('/register', [PUBLIC], passport.authenticate('register', { failureRedirect: './failregister' }),
+        this.post('/register', [PUBLIC], passport.authenticate('register', { failureRedirect: '/api/sessions/failregister' }),
             async (req, res) => {
                 res.sendSuccess({ redirect: '/' });
             })

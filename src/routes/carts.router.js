@@ -1,13 +1,16 @@
 const Router = require(`${__dirname}/router.js`);
 const { PUBLIC } = require(`${__dirname}/../config/policies.constants.js`);
-const { CartsService } = require(`${__dirname}/../services/carts.service.js`);
+
+const { FactoryDAO } = require(`${__dirname}/../dao/factory.js`);
+
+const { CartsRepository } = require(`${__dirname}/../services/carts.repository.js`);
 const { CartsController } = require(`${__dirname}/../controllers/carts.controller.js`);
 
 const withController = (callback) => {
     return (req, res) => {
-        const storage = req.app.get('cart.storage');
-        const service = new CartsService(storage);
-        const controller = new CartsController(service);
+        const dao = new FactoryDAO().getCartDao();
+        const repository = new CartsRepository(dao);
+        const controller = new CartsController(repository);
         return callback(controller, req, res);
     }
 }

@@ -1,16 +1,18 @@
 const Router = require(`${__dirname}/router.js`);
-const { PUBLIC } = require(`${__dirname}/../config/policies.constants.js`);
+const { PUBLIC, ADMIN } = require(`${__dirname}/../config/policies.constants.js`);
 
-const { ProductsService } = require(`${__dirname}/../services/products.service.js`);
+const { FactoryDAO } = require(`${__dirname}/../dao/factory.js`);
+
+const { ProductsRepository } = require(`${__dirname}/../services/products.repository.js`);
 const { ProductsController } = require(`${__dirname}/../controllers/products.controller`)
 
 const withController = (callback) => {
     return (req, res) => {
         // Storage
-        const storage = req.app.get('product.storage');
+        const dao = new FactoryDAO().getProductDao();
 
-        // Service con acceso al Storage
-        const service = new ProductsService(storage);
+        // Repository con acceso al Storage
+        const service = new ProductsRepository(dao);
 
         // Controller con acceso al Servicio
         const controller = new ProductsController(service);
@@ -21,13 +23,13 @@ const withController = (callback) => {
 
 class ProductsRouter extends Router {
     init() {
-        this.get('/', [PUBLIC], withController((controller, req, res) => controller.getAll(req, res)));
+        this.get('/', [ADMIN], withController((controller, req, res) => controller.getAll(req, res)));
 
-        this.get('/:id', [PUBLIC], withController((controller, req, res) => controller.getById(req, res)));
+        this.get('/:id', [ADMIN], withController((controller, req, res) => controller.getById(req, res)));
 
-        this.post('/', [PUBLIC], withController((controller, req, res) => controller.createOne(req, res)));
+        this.post('/', [ADMIN], withController((controller, req, res) => controller.createOne(req, res)));
 
-        this.delete('/:id', [PUBLIC], withController((controller, req, res) => controller.deleteById(req, res)));
+        this.delete('/:id', [ADMIN], withController((controller, req, res) => controller.deleteById(req, res)));
     }
 }
 module.exports = {

@@ -1,4 +1,5 @@
 class ProductsController {
+    // Service: repository.
     constructor(service) {
         this.service = service;
     }

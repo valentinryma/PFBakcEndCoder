@@ -1,20 +1,22 @@
 const Router = require(`${__dirname}/router.js`);
 const { PUBLIC, USER } = require(`${__dirname}/../config/policies.constants.js`);
 
-const { CartsService } = require(`${__dirname}/../services/carts.service.js`);
-const { ProductsService } = require(`${__dirname}/../services/products.service.js`);
-const { UsersService } = require(`${__dirname}/../services/users.service.js`);
+const { CartsRepository } = require(`${__dirname}/../services/carts.repository.js`);
+const { ProductsRepository } = require(`${__dirname}/../services/products.repository.js`);
+const { UsersRepository } = require(`${__dirname}/../services/users.repository.js`);
 
-// TEMPORAL!
-const getAccess = (req) => {
-    const cartStorage = req.app.get('cart.storage')
-    const productStorage = req.app.get('product.storage')
-    const userStorage = req.app.get('user.storage');
+const { FactoryDAO } = require(`${__dirname}/../dao/factory.js`);
 
-    const cartAccess = new CartsService(cartStorage);
-    const productAccess = new ProductsService(productStorage);
-    const usersAccess = new UsersService(userStorage);
+//! TEMPORAL!
+const getAccess = () => {
 
+    const cartDao = new FactoryDAO().getCartDao();
+    const productDao = new FactoryDAO().getProductDao();
+    const userDao = new FactoryDAO().getUserDao();
+
+    const cartAccess = new CartsRepository(cartDao);
+    const productAccess = new ProductsRepository(productDao);
+    const usersAccess = new UsersRepository(userDao);
 
     return { cartAccess, productAccess, usersAccess }
 }
@@ -23,7 +25,7 @@ class ViewsRouter extends Router {
     init() {
         this.get('/', [PUBLIC], async (req, res) => {
             // TEMPORAL!
-            const { cartAccess, productAccess } = getAccess(req);
+            const { cartAccess, productAccess } = getAccess();
 
             const filters = req.query;
             const results = await productAccess.getAll(filters);
@@ -66,7 +68,7 @@ class ViewsRouter extends Router {
 
         // TODO
         this.get('/profile', [USER], async (req, res) => {
-            const { usersAccess } = getAccess(req);
+            const { usersAccess } = getAccess();
             const id = req.user.id
             const user = await usersAccess.getById(id);
 
@@ -82,7 +84,7 @@ class ViewsRouter extends Router {
         })
 
         this.get('/carts', [USER], async (req, res) => {
-            const { cartAccess } = getAccess(req);
+            const { cartAccess } = getAccess();
 
             const id = (req.user.cart.toString());
             const cart = await cartAccess.getById(id);

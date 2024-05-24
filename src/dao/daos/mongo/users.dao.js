@@ -1,7 +1,7 @@
 // Model
-const UserModel = require(`${__dirname}/models/user.model.js`);
+const UserModel = require(`${__dirname}/../../models/user.model.js`);
 
-class UsersStorage {
+class UsersMongoDAO {
     constructor() { }
 
     async prepare() {
@@ -18,4 +18,4 @@ class UsersStorage {
 
 }
 
-module.exports = { UsersStorage }
+module.exports = { UsersMongoDAO }

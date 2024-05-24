@@ -4,9 +4,10 @@ const { Strategy } = require('passport-github2');
 const User = require(`${__dirname}/../dao/models/user.model.js`);
 const Cart = require(`${__dirname}/../dao/models/cart.model.js`);
 
-const config = require(`${__dirname}/../dot_config.js`);
-const { clientID, clientSecret, callbackURL } = config;
-
+// Variables
+const clientID = process.env.CLIENT_ID;
+const clientSecret = process.env.CLIENT_SECRET;
+const callbackURL = process.env.CALLBACK_URL;
 
 const initializeStrategy = () => {
     passport.use('github', new Strategy({

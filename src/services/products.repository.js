@@ -1,6 +1,6 @@
-class ProductsService {
-    constructor(storage) {
-        this.storage = storage;
+class ProductsRepository {
+    constructor(dao) {
+        this.dao = dao;
     }
 
     async getAll(filters = null) {
@@ -40,8 +40,8 @@ class ProductsService {
 
         // Si hay condiciones, aplica el filtrado de resultado, sino unicamente las opciones de paginate
         const products = conditions.length
-            ? await this.storage.getAll(query, options)
-            : await this.storage.getAll({}, options);
+            ? await this.dao.getAll(query, options)
+            : await this.dao.getAll({}, options);
 
         // Reemplaza "docs" por "payload"
         products.payload = products.docs;
@@ -51,7 +51,7 @@ class ProductsService {
     }
 
     async getById(id) {
-        return await this.storage.getById(id);
+        return await this.dao.getById(id);
     }
 
     async createOne(product) {
@@ -61,12 +61,12 @@ class ProductsService {
             throw new Error('invalid parameters');
         }
 
-        return await this.storage.createOne(product);
+        return await this.dao.createOne(product);
     }
 
     async deleteById(id) {
-        return await this.storage.deleteById(id);
+        return await this.dao.deleteById(id);
     }
 }
 
-module.exports = { ProductsService };
+module.exports = { ProductsRepository };
