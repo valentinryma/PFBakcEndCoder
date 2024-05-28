@@ -44,5 +44,9 @@ class CartsRepository {
         return await this.dao.updateCartProductQuantity(cid, product)
     }
 
+    async purchase(cid, purchaserEmail) {
+        return await this.dao.purchase(cid, purchaserEmail);
+    }
+
 }
 module.exports = { CartsRepository }

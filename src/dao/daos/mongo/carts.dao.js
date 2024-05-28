@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 // Models
 const CartModel = require(`${__dirname}/../../models/cart.model.js`);
 const ProductModel = require(`${__dirname}/../../models/product.model.js`);
+const TicketModel = require(`${__dirname}/../../models/ticket.model.js`);
 
 class CartsMongoDAO {
     constructor() { }
@@ -213,5 +214,90 @@ class CartsMongoDAO {
         }
     }
 
+    // Proceso de Compra
+    async purchase(cid, purchaserEmail) {
+        // Carrito Inicial
+        const cart = await CartModel.findOne({ _id: cid }).lean().populate('products._id');
+        if (!cart) throw new Error('cart not found');
+
+        // Almacena los Productos que no pudo comprar en un Array
+        let productsCantBuy = [];
+
+        for (const product of cart.products) {
+            // Si la cantidad de compra supera el stock del producto.
+            if (product._id.stock <= product.quantity) {
+                const pid = product._id._id.toString()
+                const quantity = product.quantity;
+
+                let productCantBuy = { _id: pid, quantity }
+                productsCantBuy.push(productCantBuy);
+            }
+        }
+
+        // Actualiza el carrito quitando los productos que se pudieron comprar. (No disponible para compra)
+        // Deja los que no pudo comprar, para reintentar en otro momento.
+        try {
+            await CartModel.updateOne({ _id: cid }, { $set: { products: productsCantBuy } })
+        } catch (e) {
+            console.log(`Error en ${__dirname} - purchase`, e);
+            throw new Error(e)
+        }
+
+        // Monto total + Info del producto.
+        let priceTotal = 0;
+        let productsResume = [];
+
+        for (const product of cart.products) {
+            // Filtra por los productos con stock (Disponible para compra)
+            if (product._id.stock >= product.quantity) {
+                // Crea un producto simplificado para mostrar en el resumen del ticket.
+                const quantity = product.quantity;
+                const price = product._id.price
+
+                const productResume = { quantity, pid: product._id._id.toString() }
+                productsResume.push(productResume);
+
+                // Monto total de la compra (NO tiene en cuenta los productos sin stock suficiente)
+                priceTotal += product.quantity * product._id.price;
+            }
+        }
+
+        // genera el ticket con los datos de la compra. 
+        const ticket = {
+            code: cid + Date.now(),
+            purchase_datatime: new Date,
+            purchaser: purchaserEmail,
+            products: productsResume, // Agrega información de los productos comprados
+            amount: priceTotal,
+        }
+
+        // Crea el ticket en el sistema
+        const newTicket = await TicketModel.create(ticket);
+        console.log(newTicket);
+
+        // Filtra los productos que si seran comprados, para posteriormente actualizar su stock.
+        const productsToUpdate = cart.products.filter(p => p._id.stock >= p.quantity);
+
+        // Resta el stock de los productos comprados
+        for (const product of productsToUpdate) {
+            product._id.stock -= product.quantity;
+
+            const pid = product._id._id.toString();
+            const newQuantity = product._id.stock;
+
+            // Actualiza el stock del producto comprado
+            try {
+                await ProductModel.updateOne({ _id: pid }, { $set: { stock: newQuantity } });
+
+            } catch (e) {
+                // console.log(`Error en ${__dirname} - purchase`, e);
+                throw new Error(e)
+            }
+        }
+
+        // Retorna el Ticket y un Array con los productos que no pudo comprar (Antes ya actualiza el carrito del user actual, con los productos que no pudo comprar).
+        return [ticket, productsCantBuy];
+    }
 }
+
 module.exports = { CartsMongoDAO }

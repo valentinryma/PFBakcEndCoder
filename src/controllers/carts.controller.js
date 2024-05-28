@@ -59,8 +59,6 @@ class CartsController {
 
         try {
             const cartUpdate = await this.service.addProductInCart(cid, product);
-            console.log(cartUpdate);
-
             return res.json({ status: 'success', cartUpdate })
         } catch (e) {
             return this.#handleError(res, e);
@@ -117,7 +115,18 @@ class CartsController {
         }
     }
 
+    async purchase(req, res) {
+        const cid = req.params.cid;
+        const purchaserEmail = req.user.email;
+        try {
+            const [ticket, cart] = await this.service.purchase(cid, purchaserEmail);
 
+            console.log(ticket, cart);
+            return res.json({ status: 'success', ticket, cart });
+        } catch (e) {
+            return this.#handleError(res, e);
+        }
+    }
 };
 
 module.exports = { CartsController };

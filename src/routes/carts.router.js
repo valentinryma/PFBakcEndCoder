@@ -1,5 +1,5 @@
 const Router = require(`${__dirname}/router.js`);
-const { PUBLIC } = require(`${__dirname}/../config/policies.constants.js`);
+const { PUBLIC, USER } = require(`${__dirname}/../config/policies.constants.js`);
 
 const { FactoryDAO } = require(`${__dirname}/../dao/factory.js`);
 
@@ -25,6 +25,9 @@ class CartRouter extends Router {
         this.post('/', [PUBLIC], withController((controller, req, res) => controller.createOne(req, res)))
         this.post('/:cid/product/:pid', [PUBLIC], withController((controller, req, res) => controller.addProductInCart(req, res)))
 
+        // Purchase
+        this.post('/:cid/purchase', [PUBLIC], withController((controller, req, res) => controller.purchase(req, res)));
+
         // Delete
         this.delete('/:id', [PUBLIC], withController((controller, req, res) => controller.deleteById(req, res)))
         this.delete('/:cid/product/:pid', [PUBLIC], withController((controller, req, res) => controller.deleteProductInCart(req, res)))
@@ -32,6 +35,7 @@ class CartRouter extends Router {
         // Put
         this.put('/:id/', [PUBLIC], withController((controller, req, res) => controller.updateCartProductArray(req, res)))
         this.put('/:cid/product/:pid', [PUBLIC], withController((controller, req, res) => controller.updateCartProductQuantity(req, res)))
+
     }
 }
 

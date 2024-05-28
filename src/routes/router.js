@@ -27,7 +27,6 @@ class BaseRouter {
     // Handle Policies - Roles
     handlePolicies(policies) {
         return (req, res, next) => {
-            console.log(req.user)
             // Public
             if (policies.includes(PUBLIC)) return next();
 

@@ -1,4 +1,5 @@
 const removeBtn = document.querySelectorAll('.btn-remove');
+const checkoutBtn = document.getElementById('btn-checkout');
 const cid = document.getElementById('cid').innerText;
 let pid = '';
 
@@ -8,6 +9,23 @@ for (const btn of removeBtn) {
         pid = this.id;
         removeProductCart(cid, pid);
     });
+}
+
+checkoutBtn.addEventListener('click', function () {
+    purchaseCart(cid);
+});
+
+
+function purchaseCart(cid) {
+    $.ajax(`/api/carts/${cid}/purchase`, {
+        dataType: 'json',
+        method: 'POST',
+        success: function (res) {
+            console.log(res);
+            alert('Compra realizada!');
+            window.location.reload();
+        }
+    })
 }
 
 function removeProductCart(cid, pid) {
@@ -21,14 +39,3 @@ function removeProductCart(cid, pid) {
         }
     })
 }
-
-const calcTotal = async (cid) => {
-    let total = 0;
-
-    for (const product of cart) {
-        total += product._id.price * product.quantity;
-    }
-    return total.toLocaleString()
-}
-
-// const total = calcTotal(cart.products);
