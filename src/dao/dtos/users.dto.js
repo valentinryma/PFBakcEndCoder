@@ -4,8 +4,8 @@ class UserDTO {
         this.lastName = user.lastName;
         this.age = user.age;
         this.email = user.email;
-        this.message = 'Formateado desde DTO'
         this.id = user._id.toString();
+        this.message = 'Formateado desde DTO!'
     }
 }
 

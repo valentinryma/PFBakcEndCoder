@@ -121,7 +121,7 @@ class CartsController {
         try {
             const [ticket, cart] = await this.service.purchase(cid, purchaserEmail);
 
-            console.log(ticket, cart);
+            console.log({ status: 'success', ticket, cart });
             return res.json({ status: 'success', ticket, cart });
         } catch (e) {
             return this.#handleError(res, e);
