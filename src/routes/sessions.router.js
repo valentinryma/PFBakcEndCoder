@@ -28,7 +28,10 @@ class SessionsRouter extends Router {
         this.get('/current', [PUBLIC], withController((controller, req, res) => controller.getByIdFormat(req, res)))
 
         // Local: Register 
-        this.post('/register', [PUBLIC], passport.authenticate('register', { failureRedirect: '/api/sessions/failregister' }),
+        this.post('/register', [PUBLIC], (async (req, res, next) => {
+            console.log(req.body);
+            next();
+        }), passport.authenticate('register', { failureRedirect: '/api/sessions/failregister' }),
             async (req, res) => {
                 res.sendSuccess({ redirect: '/' });
             })
@@ -48,7 +51,7 @@ class SessionsRouter extends Router {
                 const accessToken = generateToken(credentials)
                 res.cookie('accessToken', accessToken, { maxAge: 60 * 1000, httpOnly: true });
 
-                res.sendSuccess({ accessToken, redirect: `${getURL(req)}/api/sessions/current` });
+                res.sendSuccess({ accessToken, redirect: `${getURL(req)}/api/sessions/current`, home: `${getURL(req)}/` });
             })
 
         this.get('/faillogin', [PUBLIC], (_, res) => {

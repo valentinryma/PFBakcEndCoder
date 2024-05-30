@@ -27,6 +27,7 @@ const initializeStrategy = () => {
                 done(null, result);
 
             } catch (error) {
+                console.log(error);
                 done(error);
             }
         }));

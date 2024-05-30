@@ -4,21 +4,29 @@ const { PUBLIC, USER } = require(`${__dirname}/../config/policies.constants.js`)
 const { CartsRepository } = require(`${__dirname}/../services/carts.repository.js`);
 const { ProductsRepository } = require(`${__dirname}/../services/products.repository.js`);
 const { UsersRepository } = require(`${__dirname}/../services/users.repository.js`);
+const { TicketsRepository } = require(`${__dirname}/../services/tickets.repository.js`);
 
 const { FactoryDAO } = require(`${__dirname}/../dao/factory.js`);
 
-//! TEMPORAL!
+const { TicketDTO } = require(`${__dirname}/../dao/dtos/tickets.dto.js`);
+
+//! TEMPORAL! 
+// (Se saltea la capa controller, directamente utiliza el repository para acceder al dao)
 const getAccess = () => {
 
     const cartDao = new FactoryDAO().getCartDao();
     const productDao = new FactoryDAO().getProductDao();
     const userDao = new FactoryDAO().getUserDao();
+    const ticketDao = new FactoryDAO().getTicketDao();
+
+    const ticketDto = TicketDTO;
 
     const cartAccess = new CartsRepository(cartDao);
     const productAccess = new ProductsRepository(productDao);
     const usersAccess = new UsersRepository(userDao);
+    const ticketsAccess = new TicketsRepository(ticketDao, ticketDto);
 
-    return { cartAccess, productAccess, usersAccess }
+    return { cartAccess, productAccess, usersAccess, ticketsAccess }
 }
 
 class ViewsRouter extends Router {
@@ -62,7 +70,8 @@ class ViewsRouter extends Router {
 
         this.get('/register', [PUBLIC], (req, res) => {
             res.render('register', {
-                title: 'Register'
+                title: 'Register',
+                styles: ['styles.css', 'log-in.css']
             })
         })
 
@@ -106,6 +115,20 @@ class ViewsRouter extends Router {
                 products: cart.products,
                 total,
                 cartId: id,
+            })
+        })
+
+        this.get('/purchases', [USER], async (req, res) => {
+            const { ticketsAccess } = getAccess();
+            const email = req.user?.email;
+
+            const tickets = await ticketsAccess.getManyByEmail(email);
+
+            res.render('purchases', {
+                title: 'Purchases',
+                styles: ['tickets.css'],
+                tickets
+
             })
         })
     }

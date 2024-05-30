@@ -1,0 +1,23 @@
+<div class="container">
+    <h1>Purchase Tickets</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Purchase Date & Time</th>
+                <th>Amount</th>
+                <th>Purchaser</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each tickets}}
+            <tr>
+                <td>{{code}}</td>
+                <td>{{time}}</td>
+                <td>${{amount}}</td>
+                <td>{{email}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
