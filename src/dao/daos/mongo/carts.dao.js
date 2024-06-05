@@ -5,82 +5,76 @@ const CartModel = require(`${__dirname}/../../models/cart.model.js`);
 const ProductModel = require(`${__dirname}/../../models/product.model.js`);
 const TicketModel = require(`${__dirname}/../../models/ticket.model.js`);
 
+// Customs Errors & Validations
+const { CustomError } = require(`../../../services/errors/CustomError.js`);
+const { ErrorCodes } = require(`../../../services/errors/errorCodes.js`);
+
+const { generateDBNotAlreadyError } = require(`../../../services/errors/generals/generals.error.js`); // Generals Errors
+const { generateProductNotDeleteError } = require(`../../../services/products/products.error.js`); // Product Errors
+const { generateCartNotDeleteError } = require(`../../../services/carts/carts.error.js`)
+
+// Utils: Services
+const { findAndValidateModelIsFound, validateModelIsFound } = require(`../../../services/util-services/utils.services.js`);
 class CartsMongoDAO {
     constructor() { }
+
     async prepare() {
-        if (CartModel.db.readyState != 1) {
-            throw new Error('Must connect to MongoDB');
+        const readyState = CartModel.db.readyState
+        if (readyState != 1) {
+            throw CustomError.createError({
+                name: 'DBNotAlready',
+                cause: generateDBNotAlreadyError({ readyState }),
+                message: 'Data base is not already',
+                code: ErrorCodes.DATABASE_ERROR
+            });
         }
     }
 
-
     async getAll() {
-        try {
-            const results = await CartModel.find();
-            // console.log(`Carts encontrados: ${carts}`);
+        const results = await CartModel.find();
+        const carts = results.map(cart => cart.toObject({ virtuals: true })); // Convierte los documentos Mongo en Objetos
 
-            // Convierte los documentos Mongo en Objetos
-            const carts = results.map(cart => cart.toObject({ virtuals: true }));
-            return carts;
-
-        } catch (e) {
-            console.log(`Error en ${__dirname} - getAll`, e);
-            throw new Error(e)
-        }
+        return carts;
     }
 
 
     async getById(id) {
-        try {
-            const cart = await CartModel.findOne({ _id: id }).lean().populate('products._id');
-            if (!cart) throw new Error('cart not found');
-            // console.log(`Cart encontrado: ${cart}`);
-            return cart;
+        // Valida que haya encontrado un cart.
+        const cart = await CartModel.findOne({ _id: id }).lean().populate('products._id');
+        validateModelIsFound(cart, id, 'cart');
 
-        } catch (e) {
-            console.log(`Error en ${__dirname} - getById`, e);
-            throw new Error(e)
-        }
+        return cart;
     }
-
 
     // Crea nuevo carrito vacio
     async createOne() {
-        try {
-            const newCart = await CartModel.create({ products: [] });
-            return newCart;
-
-        } catch (e) {
-            console.log(`Error en ${__dirname} - createOne`, e);
-            throw new Error(e)
-        }
+        const newCart = await CartModel.create({ products: [] });
+        return newCart;
     }
 
 
     async deleteById(id) {
-        try {
-            const cartDelete = await CartModel.deleteOne({ _id: id });
-            if (cartDelete.deletedCount == 0) {
-                throw new Error('cart not found');
-            }
-            // console.log(`Carrito eliminado: ${cartDelete}`);
-            return cartDelete;
+        // Verifica la existencia del Cart y retorna el mismo.
+        const cartDelete = await findAndValidateModelIsFound(CartModel, id, 'cart')
 
-        } catch (e) {
-            console.log(`Error en ${__dirname} - deleteById`, e);
-            throw new Error(e)
+        if (cartDelete.deletedCount == 0) {
+            throw CustomError.createError({
+                name: 'CartNotDelete',
+                cause: generateCartNotDeleteError({ id }),
+                message: 'Cart can not delete',
+                code: ErrorCodes.CART_DELETION_FAILED
+            });
         }
+
+        return cartDelete;
     }
 
+    async addProductInCart(cid, pid, quantity) {
+        // Verifica que exista el Cart
+        const cart = await findAndValidateModelIsFound(CartModel, cid, 'cart');
 
-    async addProductInCart(cid, product) {
-        const { pid, quantity } = product
-
-        const cart = await CartModel.findOne({ _id: cid });
-        if (!cart) throw new Error('cart not found');
-
-        const productToAdd = await ProductModel.findOne({ _id: pid });
-        if (!productToAdd) throw new Error('product not found');
+        // Verifica que exista el Product
+        await findAndValidateModelIsFound(ProductModel, pid, 'product');
 
         // Verifica si el producto ya existe en el carrito.
         let found = cart.products.find((product) => {
@@ -89,136 +83,108 @@ class CartsMongoDAO {
 
         // Actualiza el quantity del producto del carrito, si esta ya existe en el mismo.
         if (found) {
-            product.quantity += found.quantity;
+            quantity += found.quantity;
 
-            try {
-                const cartUpdate = await CartModel.updateOne({ _id: cid, 'products._id': pid },
-                    { $set: { 'products.$.quantity': product.quantity } }
-                )
-
-                // console.log(`Carrito actualizado: ${await CartModel.findOne({ _id: cid })}`);
-                return cartUpdate;
-
-            } catch (e) {
-                console.log(`Error en ${__dirname} - addProductInCart \n`, e);
-                throw new Error(e)
-            }
-        }
-
-        try {
-            // Agrega el producto en el carrito.
-            const cartUpdate = await CartModel.updateOne({ _id: cid }, {
-                $push: { products: { _id: pid, quantity } }
-            });
+            // Try-catch?
+            const cartUpdate = await CartModel.updateOne({ _id: cid, 'products._id': pid },
+                { $set: { 'products.$.quantity': quantity } }
+            )
 
             return cartUpdate;
-
-        } catch (e) {
-            console.log(`Error en ${__dirname} - addProductInCart`, e);
-            throw new Error(e)
         }
+
+        // Agrega el producto en el carrito.
+        // Try-catch?
+        const cartUpdate = await CartModel.updateOne({ _id: cid }, {
+            $push: { products: { _id: pid, quantity } }
+        });
+
+        return cartUpdate;
+
     }
 
+    //generateProductNotDeleteError
     async deleteProductInCart(cid, pid) {
-        const cart = await CartModel.findOne({ _id: cid });
-        if (!cart) throw new Error('cart not found');
+        // Verifica que exista el Cart
+        const cart = await findAndValidateModelIsFound(CartModel, cid, 'cart')
 
-        const product = await ProductModel.findOne({ _id: pid });
-        if (!product) throw new Error('product not found');
+        // Verifica que exista el Product
+        const product = await findAndValidateModelIsFound(ProductModel, pid, 'product')
 
         const cartUpdate = await CartModel.updateOne({ _id: cid }, {
             $pull: { products: { _id: pid } }
         })
+
 
         return cartUpdate;
     }
 
     // Pisa todos los productos del carrito con un array de productos | Sirve como clearCart (cid, [])
     async updateCartProductArray(cid, products) {
-        try {
-            const cart = await CartModel.findOne({ _id: cid });
-            if (!cart) throw new Error('cart not found');
+        // Verifica la existencia del Cart.
+        await findAndValidateModelIsFound(CartModel, cid, 'cart');
 
-            const cartUpdate = await CartModel.updateOne({ _id: cid }, {
-                $set: { products }
-            })
+        const cartUpdate = await CartModel.updateOne({ _id: cid }, {
+            $set: { products }
+        })
 
-            // console.log(`Carrito actualizado: ${cartUpdate}`);
-            return cartUpdate;
-
-        } catch (e) {
-            console.log(`Error en ${__dirname} - updateCartProductArray`, e);
-            throw new Error(e)
-        }
+        return cartUpdate;
     }
 
     // Retorna el numero total de productos dentro de un carrito (NO tiene en cuenta quantity.)
     async getTotalProducts(cid) {
-        const cart = await CartModel.findOne({ _id: cid });
-        if (!cart) throw new Error('cart not found');
+        // Verifica que exista el Cart
+        await findAndValidateModelIsFound(CartModel, cid, 'cart');
 
-        try {
-            const result = await CartModel.aggregate([ // Pipeline
-                { // Stage 1: "Selecciona" el carrito 
-                    $match: { _id: new mongoose.Types.ObjectId(cid) }
-                },
-                { // Stage 2: Genera un campo "totalProducts" el cual contiene el tamaño del arreglo "prdoucts" (cantidad de productos)
-                    $project: { totalProducts: { $size: '$products' } }
-                }
-            ]);
+        const result = await CartModel.aggregate([ // Pipeline
+            { // Stage 1: "Selecciona" el carrito 
+                $match: { _id: new mongoose.Types.ObjectId(cid) }
+            },
+            { // Stage 2: Genera un campo "totalProducts" el cual contiene el tamaño del arreglo "prdoucts" (cantidad de productos)
+                $project: { totalProducts: { $size: '$products' } }
+            }
+        ]);
 
-            const total = +(result[0].totalProducts);
-
-            // console.log(`total productos en el carrito: ${total}`)
-            return total;
-
-        } catch (error) {
-            console.log(`Error en ${__dirname} - getTotalProducts`, e);
-            throw new Error(e)
-        }
+        const total = +(result[0].totalProducts);
+        return total;
     }
 
     // Actualiza la cantidad de un producto en un carrito
-    async updateCartProductQuantity(cid, product) {
-        const pid = product.pid;
-        const newQuantity = product.quantity;
+    async updateCartProductQuantity(cid, pid, newQuantity) {
+        // Verifica que exista el Cart
+        const cart = await findAndValidateModelIsFound(CartModel, cid, 'cart')
 
-        const cart = await CartModel.findOne({ _id: cid });
-        if (!cart) throw new Error('not found')
-
-        const productFound = await ProductModel.findOne({ _id: pid });
-        if (!productFound) throw new Error('not found')
+        // Verifica que exista el Product
+        await findAndValidateModelIsFound(ProductModel, pid, 'product')
 
         // Verifica la existencia del producto en el carrito
-        const found = cart.products.find((product) => {
+        const productFound = cart.products.find((product) => {
             return (product.id).toString() === pid;
         })
 
-        if (!found) {
-            console.log('Product not in cart');
-            throw new Error('not found')
+        if (!productFound) {
+            throw CustomError.createError({
+                name: 'ProductNotInCart',
+                cause: `Product not in cart`,
+                message: 'Error trying to update product quantity in cart',
+                code: ErrorCodes.CART_UPDATE_FAILED
+            })
         }
 
         // Actualiza el quantity del producto
-        try {
-            const cartUpdate = await CartModel.updateOne({ _id: cid, 'products._id': pid }, {
-                $set: { 'products.$.quantity': newQuantity }
-            })
+        const cartUpdate = await CartModel.updateOne({ _id: cid, 'products._id': pid }, {
+            $set: { 'products.$.quantity': newQuantity }
+        })
 
-            // console.log(`Carrito actualizado: ${cartUpdate}`)
-            return cartUpdate;
+        // console.log(`Carrito actualizado: ${cartUpdate}`)
+        return cartUpdate;
 
-        } catch (e) {
-            console.log(`Error en ${__dirname} - updateCartProductQuantity`, e);
-            throw new Error(e)
-        }
     }
 
     // Proceso de Compra
     async purchase(cid, purchaserEmail) {
         // Carrito Inicial
-        const cart = await CartModel.findOne({ _id: cid }).lean().populate('products._id');
-        if (!cart) throw new Error('cart not found');
+        const cart = await findAndValidateModelIsFound(CartModel, pid, 'cart');
 
         // Almacena los Productos que no pudo comprar en un Array
         let productsCantBuy = [];
@@ -236,12 +202,7 @@ class CartsMongoDAO {
 
         // Actualiza el carrito quitando los productos que se pudieron comprar. (No disponible para compra)
         // Deja los que no pudo comprar, para reintentar en otro momento.
-        try {
-            await CartModel.updateOne({ _id: cid }, { $set: { products: productsCantBuy } })
-        } catch (e) {
-            console.log(`Error en ${__dirname} - purchase`, e);
-            throw new Error(e)
-        }
+        await CartModel.updateOne({ _id: cid }, { $set: { products: productsCantBuy } })
 
         // Monto total + Info del producto.
         let priceTotal = 0;
@@ -286,13 +247,7 @@ class CartsMongoDAO {
             const newQuantity = product._id.stock;
 
             // Actualiza el stock del producto comprado
-            try {
-                await ProductModel.updateOne({ _id: pid }, { $set: { stock: newQuantity } });
-
-            } catch (e) {
-                // console.log(`Error en ${__dirname} - purchase`, e);
-                throw new Error(e)
-            }
+            await ProductModel.updateOne({ _id: pid }, { $set: { stock: newQuantity } });
         }
 
         // Retorna el Ticket y un Array con los productos que no pudo comprar (Antes ya actualiza el carrito del user actual, con los productos que no pudo comprar).

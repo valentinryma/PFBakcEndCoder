@@ -3,7 +3,7 @@ const { PUBLIC, ADMIN, USER } = require(`${__dirname}/../config/policies.constan
 
 const { FactoryDAO } = require(`${__dirname}/../dao/factory.js`);
 
-const { ProductsRepository } = require(`${__dirname}/../services/products.repository.js`);
+const { ProductsRepository } = require(`${__dirname}/../services/products/products.repository.js`);
 const { ProductsController } = require(`${__dirname}/../controllers/products.controller`)
 
 const withController = (callback) => {
@@ -25,11 +25,11 @@ class ProductsRouter extends Router {
     init() {
         this.get('/', [USER], withController((controller, req, res) => controller.getAll(req, res)));
 
-        this.get('/:id', [ADMIN], withController((controller, req, res) => controller.getById(req, res)));
+        this.get('/:id', [USER], withController((controller, req, res) => controller.getById(req, res)));
 
-        this.post('/', [ADMIN], withController((controller, req, res) => controller.createOne(req, res)));
+        this.post('/', [PUBLIC /*ADMIN*/], withController((controller, req, res) => controller.createOne(req, res)));
 
-        this.delete('/:id', [ADMIN], withController((controller, req, res) => controller.deleteById(req, res)));
+        this.delete('/:id', [PUBLIC /*ADMIN*/], withController((controller, req, res) => controller.deleteById(req, res)));
     }
 }
 module.exports = {

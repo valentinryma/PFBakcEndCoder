@@ -3,7 +3,7 @@ const { PUBLIC, USER } = require(`${__dirname}/../config/policies.constants.js`)
 
 const { FactoryDAO } = require(`${__dirname}/../dao/factory.js`);
 
-const { CartsRepository } = require(`${__dirname}/../services/carts.repository.js`);
+const { CartsRepository } = require(`${__dirname}/../services/carts/carts.repository.js`);
 const { CartsController } = require(`${__dirname}/../controllers/carts.controller.js`);
 
 const withController = (callback) => {

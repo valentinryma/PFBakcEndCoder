@@ -10,6 +10,9 @@ const cookieParser = require('cookie-parser');
 
 const app = express();
 
+// Error Handler
+const { errorHandler } = require(`./services/errors/errorHandler.js`);
+
 // Passport Config.
 const initializeStrategyJWT = require(`${__dirname}/config/passport-jwt.config.js`);
 const initializeStrategyLocal = require(`${__dirname}/config/passport-local.config.js`);
@@ -50,11 +53,15 @@ const routes = [
     require(`${__dirname}/routes/carts.router.js`),
     require(`${__dirname}/routes/views.router.js`),
     require(`${__dirname}/routes/sessions.router.js`),
+    require(`${__dirname}/routes/mocks.router.js`),
 ];
 
 for (const route of routes) {
     route.configure(app);
 }
+
+
+app.use(errorHandler);
 
 const main = async () => {
     const persistence = process.env.PERSISTENCE || 'MONGO' // Default

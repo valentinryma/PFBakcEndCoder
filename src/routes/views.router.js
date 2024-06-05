@@ -1,10 +1,10 @@
 const Router = require(`${__dirname}/router.js`);
 const { PUBLIC, USER } = require(`${__dirname}/../config/policies.constants.js`);
 
-const { CartsRepository } = require(`${__dirname}/../services/carts.repository.js`);
-const { ProductsRepository } = require(`${__dirname}/../services/products.repository.js`);
-const { UsersRepository } = require(`${__dirname}/../services/users.repository.js`);
-const { TicketsRepository } = require(`${__dirname}/../services/tickets.repository.js`);
+const { CartsRepository } = require(`${__dirname}/../services/carts/carts.repository.js`);
+const { ProductsRepository } = require(`${__dirname}/../services/products/products.repository.js`);
+const { UsersRepository } = require(`${__dirname}/../services/users/users.repository.js`);
+const { TicketsRepository } = require(`${__dirname}/../services/tickets/tickets.repository.js`);
 
 const { FactoryDAO } = require(`${__dirname}/../dao/factory.js`);
 
@@ -32,6 +32,8 @@ const getAccess = () => {
 class ViewsRouter extends Router {
     init() {
         this.get('/', [PUBLIC], async (req, res) => {
+
+
             // TEMPORAL!
             const { cartAccess, productAccess } = getAccess();
 
@@ -40,14 +42,19 @@ class ViewsRouter extends Router {
 
             // Verifica si el user esta logueado.
             let isLoggedIn = false;
-            let cartId = 'null'
+            let cartId = null
+            let total = 0;
 
             if (req.user) {
                 isLoggedIn = true;
                 cartId = req.user?.cart.toString();
             }
 
-            const total = await cartAccess.getTotalProducts(cartId);
+            if (cartId != null) {
+                total = await cartAccess.getTotalProducts(cartId);
+            }
+
+
             // No se si res.render, tendria que ir en un controller particular
             res.render('index', {
                 title: 'Pagina Principal',

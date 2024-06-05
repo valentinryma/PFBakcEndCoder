@@ -1,3 +1,10 @@
+// Custom Erros & Validations
+const { CustomError } = require(`${__dirname}/../errors/CustomError.js`);
+const { ErrorCodes } = require(`${__dirname}/../errors/errorCodes.js`);
+const { generateInvalidProductDataError } = require(`${__dirname}/products.error.js`);
+const { validateIds } = require(`${__dirname}/../util-services/utils.services.js`);
+
+
 class ProductsRepository {
     constructor(dao) {
         this.dao = dao;
@@ -51,20 +58,36 @@ class ProductsRepository {
     }
 
     async getById(id) {
-        return await this.dao.getById(id);
+        // Valida que sea un ObjectId valido.
+        validateIds(id)
+
+        await this.dao.getById(id);
     }
 
     async createOne(product) {
         // Verificamos los datos
-        const { title, code, price, status, stock, category, thumbnails } = product
+        const { title, code, price, status, stock, category, thumbnails } = product;
+
+        // Valida la Data del Producto
         if (!title || !code || !price || !status || !stock || !category) {
-            throw new Error('invalid parameters');
+            throw CustomError.createError({
+                name: 'InvalidProductData',
+                cause: generateInvalidProductDataError({ title, code, price, status, stock, category, thumbnails }),
+                message: 'Error trying to create a new product',
+                code: ErrorCodes.INVALID_TYPES_ERROR
+            })
         }
 
         return await this.dao.createOne(product);
     }
 
     async deleteById(id) {
+        // Valida que sea un ObjectId valido.
+        validateIds(id)
+
+        // Verifica que haya un user al momento antes de intentar eleminar el producto en el dao
+        await this.dao.getById(id);
+
         return await this.dao.deleteById(id);
     }
 }

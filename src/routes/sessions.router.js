@@ -8,7 +8,7 @@ const { generateToken } = require(`../utils/jwt.js`);
 const { UserDTO } = require('../dao/DTOs/users.dto.js');
 
 const { FactoryDAO } = require(`${__dirname}/../dao/factory.js`);
-const { UsersRepository } = require(`${__dirname}/../services/users.repository.js`);
+const { UsersRepository } = require(`${__dirname}/../services/users/users.repository.js`);
 const { UsersController } = require(`${__dirname}/../controllers/users.controller.js`)
 
 const withController = (callback) => {

@@ -45,13 +45,17 @@ class BaseRouter {
     // Middlewares Dinamicos
     customizeCallback(callbacks) {
         return callbacks.map((callback) => async (...params) => {
-            try {
-                await callback.apply(this, params);
-            } catch (error) {
-                console.log(error);
-                const [, res,] = params;
-                return res.status(500).send(error);
-            }
+            await callback.apply(this, params);
+
+            // Lo sacamos del try-catch, ya que sino cortaria el flujo de errores
+            // y ahora tenemos un middleware errorHandler encargado del manejo de estos.
+
+            // try {
+            // } catch (error) {
+            //     console.log(error);
+            //     const [, res,] = params;
+            //     return res.status(500).send(error);
+            // }
         })
     }
 
