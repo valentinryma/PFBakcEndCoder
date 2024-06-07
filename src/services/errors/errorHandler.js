@@ -4,7 +4,7 @@ const { ErrorCodes } = require(`./errorCodes.js`);
  * @type {import("express").ErrorRequestHandler}
  */
 const errorHandler = (error, req, res, next) => {
-    errorMessageFormat(error);
+    errorMessageFormat(req, error);
 
     switch (error.code) {
         // General Errors
@@ -93,11 +93,16 @@ const errorHandler = (error, req, res, next) => {
     return error;
 }
 
-const errorMessageFormat = (error) => {
-    console.log('\n\n-- Error: ' + error.name + ' ' + '----------'.repeat(3));
-    console.log(error.cause);
-    console.log('----------'.repeat(6) + '\n\n');
-
+const errorMessageFormat = (req, error) => {
+    req.logger.error(error.name)
+    req.logger.info(`${error.cause}`)
+    req.logger.http(`Endpoint: ${req.url}`)
 }
+
+// const errorMessageFormat = (error) => {
+//     console.log('\n\n-- Error: ' + error.name + ' ' + '----------'.repeat(3));
+//     console.log(error.cause);
+//     console.log('----------'.repeat(6) + '\n\n');
+// }
 
 module.exports = { errorHandler };
