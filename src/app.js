@@ -10,6 +10,9 @@ const cookieParser = require('cookie-parser');
 
 const app = express();
 
+// Logger
+const { useLogger } = require(`${__dirname}/logger/logger.js`);
+
 // Error Handler
 const { errorHandler } = require(`./services/errors/errorHandler.js`);
 
@@ -20,6 +23,9 @@ const initializeStrategyGitHub = require(`${__dirname}/config/passport-github.co
 
 // Sessions
 const sessionMiddleware = require(`${__dirname}/sessions/mongoStorage.js`);
+
+// Error Logger - winston
+app.use(useLogger);
 
 // Handlebars Config.
 app.engine('handlebars', handlebars.engine())
@@ -49,17 +55,17 @@ app.use(passport.session())
 
 // Routers
 const routes = [
-    require(`${__dirname}/routes/products.router.js`),
-    require(`${__dirname}/routes/carts.router.js`),
-    require(`${__dirname}/routes/views.router.js`),
-    require(`${__dirname}/routes/sessions.router.js`),
-    require(`${__dirname}/routes/mocks.router.js`),
+    require(`${__dirname}/routes/products.router.js`), // Products - Router
+    require(`${__dirname}/routes/sessions.router.js`), // Sessions - Router
+    require(`${__dirname}/routes/carts.router.js`),    // Carts  - Router
+    require(`${__dirname}/routes/views.router.js`),    // Views  - Router
+    require(`${__dirname}/routes/mocks.router.js`),    // Mocks  - Router
+    require(`${__dirname}/routes/logger.router.js`),   // Logger - Router
 ];
 
 for (const route of routes) {
     route.configure(app);
 }
-
 
 app.use(errorHandler);
 
