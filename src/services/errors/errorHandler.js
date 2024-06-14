@@ -84,7 +84,6 @@ const errorHandler = (error, req, res, next) => {
             res.status(401).send({ status: 'error', error: error.message });
             break;
 
-
         default:
             console.log(error);
             res.status(500).send({ status: 'error', error: 'Uknown' });

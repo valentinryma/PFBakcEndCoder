@@ -83,6 +83,9 @@ class LoggerRouter extends Router {
             req.logger.http(testString);
             req.logger.debug(testString);
 
+            console.log(req?.logger);
+            // res.send(req.logger);
+
             res.json({
                 test: 'all',
                 environment: process.env.ENV,
