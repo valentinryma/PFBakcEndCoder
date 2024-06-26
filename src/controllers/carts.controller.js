@@ -32,9 +32,10 @@ class CartsController {
     async addProductInCart(req, res) {
         const cid = req.params.cid;
         const pid = req.params.pid;
+        const uid = req.user._id; // User Id
         const quantity = (req.body?.quantity || 1);
 
-        const cartUpdate = await this.service.addProductInCart(cid, pid, quantity);
+        const cartUpdate = await this.service.addProductInCart(cid, pid, uid, quantity);
         return res.json({ status: 'success', cartUpdate })
 
     }
@@ -42,6 +43,7 @@ class CartsController {
     async deleteProductInCart(req, res) {
         const cid = req.params.cid;
         const pid = req.params.pid;
+        const uid = req.user._id;
 
         const cartUpdate = await this.service.deleteProductInCart(cid, pid);
         return res.json({ status: 'success', cartUpdate })

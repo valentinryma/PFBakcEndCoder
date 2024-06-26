@@ -1,5 +1,5 @@
 const Router = require(`${__dirname}/router.js`);
-const { PUBLIC, ADMIN, USER } = require(`${__dirname}/../config/policies.constants.js`);
+const { PUBLIC, ADMIN, USER, PREMIUM } = require(`${__dirname}/../config/policies.constants.js`);
 
 const { FactoryDAO } = require(`${__dirname}/../dao/factory.js`);
 
@@ -23,13 +23,13 @@ const withController = (callback) => {
 
 class ProductsRouter extends Router {
     init() {
-        this.get('/', [USER], withController((controller, req, res) => controller.getAll(req, res)));
+        this.get('/', [PUBLIC], withController((controller, req, res) => controller.getAll(req, res)));
 
         this.get('/:id', [USER], withController((controller, req, res) => controller.getById(req, res)));
 
         this.post('/', [PUBLIC /*ADMIN*/], withController((controller, req, res) => controller.createOne(req, res)));
 
-        this.delete('/:id', [PUBLIC /*ADMIN*/], withController((controller, req, res) => controller.deleteById(req, res)));
+        this.delete('/:id', [ADMIN, PREMIUM], withController((controller, req, res) => controller.deleteById(req, res)));
     }
 }
 module.exports = {

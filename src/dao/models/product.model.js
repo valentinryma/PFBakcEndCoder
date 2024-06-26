@@ -11,6 +11,7 @@ const schema = new mongoose.Schema({
     stock: { type: Number, require: true },
     category: { type: String, require: true },
     thumbnails: [{ type: String }],
+    owner: { type: mongoose.Schema.Types.ObjectId, default: 'admin', ref: 'User' },
 })
 
 // Virtual

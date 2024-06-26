@@ -15,6 +15,7 @@ const { generateCartNotDeleteError } = require(`../../../services/carts/carts.er
 
 // Utils: Services
 const { findAndValidateModelIsFound, validateModelIsFound } = require(`../../../services/util-services/utils.services.js`);
+const userModel = require('../../models/user.model.js');
 class CartsMongoDAO {
     constructor() { }
 
@@ -69,7 +70,25 @@ class CartsMongoDAO {
         return cartDelete;
     }
 
-    async addProductInCart(cid, pid, quantity) {
+    async addProductInCart(cid, pid, uid, quantity) {
+
+        const user = await userModel.findById({ _id: uid });
+        const product = await ProductModel.findById({ _id: pid });
+
+        const productOwner = product.owner?.toString() || 'null';
+
+        const isPremiumUser = user.role === 'premium';
+        const isUserOwnerProduct = productOwner === uid.toString();
+
+        if (isPremiumUser && isUserOwnerProduct) {
+            throw CustomError.createError({
+                name: 'PremiumUserDeleteOwnerProduct',
+                cause: `Usuario Premium no puede agregar al carrito un producto propio`,
+                message: 'Cart can not update',
+                code: ErrorCodes.CART_UPDATE_FAILED
+            });
+        }
+
         // Verifica que exista el Cart
         const cart = await findAndValidateModelIsFound(CartModel, cid, 'cart');
 
@@ -104,12 +123,26 @@ class CartsMongoDAO {
     }
 
     //generateProductNotDeleteError
-    async deleteProductInCart(cid, pid) {
+    async deleteProductInCart(cid, pid, uid) {
         // Verifica que exista el Cart
         const cart = await findAndValidateModelIsFound(CartModel, cid, 'cart')
-
+        const user = await userModel.findById({ _id: uid });
         // Verifica que exista el Product
         const product = await findAndValidateModelIsFound(ProductModel, pid, 'product')
+
+        const productOwner = product.owner?.toString() || 'null';
+
+        const isPremiumUser = user.role === 'premium';
+        const isUserOwnerProduct = productOwner === uid.toString();
+
+        if (isPremiumUser && isUserOwnerProduct) {
+            throw CustomError.createError({
+                name: 'PremiumUserDeleteOwnerProduct',
+                cause: `Usuario Premium no puede agregar al carrito un producto propio`,
+                message: 'Cart can not update',
+                code: ErrorCodes.CART_UPDATE_FAILED
+            });
+        }
 
         const cartUpdate = await CartModel.updateOne({ _id: cid }, {
             $pull: { products: { _id: pid } }

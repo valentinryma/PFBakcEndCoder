@@ -1,6 +1,6 @@
 // Custom Erros & Validations
 const { CustomError } = require(`${__dirname}/../errors/CustomError.js`);
-const { ErrorCodes } = require(`${__dirname}/../errors/errorCodes.js`);
+const { ErrorCodes } = require(`../errors/errorCodes.js`);
 const { generateInvalidProductDataError } = require(`${__dirname}/products.error.js`);
 const { validateIds } = require(`${__dirname}/../util-services/utils.services.js`);
 
@@ -81,12 +81,24 @@ class ProductsRepository {
         return await this.dao.createOne(product);
     }
 
-    async deleteById(id) {
+    async deleteById(id, uid) {
         // Valida que sea un ObjectId valido.
         validateIds(id)
 
-        // Verifica que haya un user al momento antes de intentar eleminar el producto en el dao
-        await this.dao.getById(id);
+        // Verifica que exista el product al momento antes de intentar eleminar el producto en el dao
+        const product = await this.dao.getById(id);
+        const { owner } = product;
+
+        const isOwnerProduct = owner.toString() === uid.toString();
+        if (isOwnerProduct){
+            throw CustomError.createError({
+                name: 'InvalidAction',
+                cause: `A premium user cannot delete products that belong to them.`,
+                message: 'Error trying to delete a product',
+                code: ErrorCodes.AUTHORIZATION_ERROR
+            })
+        }
+
 
         return await this.dao.deleteById(id);
     }

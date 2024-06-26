@@ -1,5 +1,7 @@
 const Router = require(`${__dirname}/router.js`);
-const { PUBLIC, USER } = require(`${__dirname}/../config/policies.constants.js`);
+const { PUBLIC, USER, PREMIUM, ADMIN } = require(`${__dirname}/../config/policies.constants.js`);
+
+const { verifyPassToken } = require(`../utils/jwt.js`);
 
 const { CartsRepository } = require(`${__dirname}/../services/carts/carts.repository.js`);
 const { ProductsRepository } = require(`${__dirname}/../services/products/products.repository.js`);
@@ -82,8 +84,7 @@ class ViewsRouter extends Router {
             })
         })
 
-        // TODO
-        this.get('/profile', [USER], async (req, res) => {
+        this.get('/profile', [USER, PREMIUM, ADMIN], async (req, res) => {
             const { usersAccess } = getAccess();
             const id = req.user.id
             const user = await usersAccess.getById(id);
@@ -99,7 +100,7 @@ class ViewsRouter extends Router {
             })
         })
 
-        this.get('/carts', [USER], async (req, res) => {
+        this.get('/carts', [USER, PREMIUM, ADMIN], async (req, res) => {
             const { cartAccess } = getAccess();
 
             const id = (req.user.cart.toString());
@@ -125,7 +126,7 @@ class ViewsRouter extends Router {
             })
         })
 
-        this.get('/purchases', [USER], async (req, res) => {
+        this.get('/purchases', [USER, PREMIUM, ADMIN], async (req, res) => {
             const { ticketsAccess } = getAccess();
             const email = req.user?.email;
 
@@ -136,6 +137,28 @@ class ViewsRouter extends Router {
                 styles: ['tickets.css'],
                 tickets
 
+            })
+        })
+
+        this.get('/sendEmailToReset', [PUBLIC], async (req, res) => {
+            res.render('send_email_reset_pwd', {
+                title: 'Reset Password',
+                styles: ['styles.css', 'log-in.css'],
+
+            })
+        })
+
+        this.get('/resetPassword/:tid', [PUBLIC], verifyPassToken, async (req, res) => {
+            const tid = req.params.tid;
+            const passwordToken = req.cookies.passToken;
+            if (!passwordToken) {
+                // error
+            }
+
+            res.render('reset_pwd', {
+                title: 'Reset Password',
+                styles: ['styles.css', 'log-in.css'],
+                tid
             })
         })
     }

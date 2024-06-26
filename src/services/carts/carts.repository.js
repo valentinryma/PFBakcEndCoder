@@ -29,7 +29,7 @@ class CartsRepository {
         return await this.dao.deleteById(id);
     }
 
-    async addProductInCart(cid, pid, quantity) {
+    async addProductInCart(cid, pid, uid, quantity) {
         // Valida que venga el productID dentro de product.
         if (!pid) {
             throw CustomError.createError({
@@ -42,16 +42,27 @@ class CartsRepository {
             })
         }
 
+        if (!uid) {
+            throw CustomError.createError({
+                name: 'InvalidUserData',
+                cause: `Invalid User data:
+            - product.uid: sholud be a non-empty [ String ], recived ${uid} - type [ ${typeof uid} ]
+            `,
+                message: 'Error trying to add product in cart',
+                code: ErrorCodes.INVALID_TYPES_ERROR
+            })
+        }
+
         // Valida los id de cart y product.
         validateIds(cid, pid);
 
-        return await this.dao.addProductInCart(cid, pid, quantity);
+        return await this.dao.addProductInCart(cid, pid, uid, quantity);
     }
 
-    async deleteProductInCart(cid, pid) {
+    async deleteProductInCart(cid, pid, uid) {
         // Valida los id de cart y product.
         validateIds(cid, pid);
-        return await this.dao.deleteProductInCart(cid, pid);
+        return await this.dao.deleteProductInCart(cid, pid, uid);
     }
 
     async updateCartProductArray(cid, products) {

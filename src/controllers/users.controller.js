@@ -3,26 +3,46 @@ class UsersController {
         this.service = service;
     }
 
-    // Forma antigua!
-    #handleError(res, e) {
-        if (e.message === 'invalid parameters') return res.status(400).json('Invalid parameters');
-        if (e.message === 'not found') return res.status(404).json('Not found');
-        return res.status(500).json({ error: e.message });
-    }
-
     async getById(req, res) {
         const uid = req.params.uid;
         const user = await this.service.getById(uid);
     }
 
     async getByIdFormat(req, res) {
-        try {
-            const id = req.user._id.toString();
-            const user = await this.service.getByIdFormat(id);
-            res.sendSuccess({ user });
-        } catch (e) {
-            return this.#handleError(res, e);
-        }
+        const id = req.user._id.toString();
+        const user = await this.service.getByIdFormat(id);
+        res.sendSuccess({ user });
+
+    }
+
+
+    async sendEmailResetPassword(req, res) {
+        const email = req.body.email;
+        const passwordToken = await this.service.sendEmailResetPassword(email);
+
+        // Guardar Token en Cookie
+        res.cookie('passToken', passwordToken, { maxAge: 60 * 60 * 1000, httpOnly: true });
+
+        res.json({ message: 'mail enviado' });
+    }
+
+
+    async resetPassword(req, res) {
+        const tid = req.params.tid;
+        const token = req.passToken;
+
+        const { password, confirmPassword } = req.body;
+
+        await this.service.resetPassword(tid, token, password, confirmPassword);
+        res.json({ message: 'Password change' });
+    }
+
+    async turnPremiumRole(req, res) {
+
+        const id = req.params.id;
+        const newRole = await this.service.turnPremiumRole(id);
+
+        res.json({ status: 'success', newRole })
 
     }
 }

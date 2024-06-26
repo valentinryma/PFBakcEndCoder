@@ -27,7 +27,9 @@ class ProductsController {
 
     async deleteById(req, res) {
         const id = req.params.id;
-        const productDelete = await this.service.deleteById(id);
+        const uid = req.user._id;
+
+        const productDelete = await this.service.deleteById(id, uid);
 
         return res.json({ status: 'success', payload: productDelete });
 

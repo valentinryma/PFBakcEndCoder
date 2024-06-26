@@ -1,16 +1,26 @@
 const passport = require('passport');
-const Router = require(`${__dirname}/router.js`);
-const { PUBLIC } = require(`${__dirname}/../config/policies.constants.js`);
+const Router = require(`./router.js`);
+const { PUBLIC } = require(`../config/policies.constants.js`);
 
-// TO-DO Mover a otra capa
-const { getURL } = require(`${__dirname}/../utils/utils.js`);
-const { generateToken } = require(`../utils/jwt.js`);
+const { getURL } = require(`../utils/utils.js`);
+const { generateToken, verifyPassToken } = require(`../utils/jwt.js`);
 const { UserDTO } = require('../dao/DTOs/users.dto.js');
 
-const { FactoryDAO } = require(`${__dirname}/../dao/factory.js`);
-const { UsersRepository } = require(`${__dirname}/../services/users/users.repository.js`);
-const { UsersController } = require(`${__dirname}/../controllers/users.controller.js`)
+const { FactoryDAO } = require(`../dao/factory.js`);
+const { UsersRepository } = require(`../services/users/users.repository.js`);
+const { UsersController } = require(`../controllers/users.controller.js`)
 
+
+/**
+ * Función de ayuda para inyectar un controlador en un callback.
+ * 
+ * Esta función crea una instancia del DAO de usuario, el DTO de usuario, el repositorio de usuarios y el controlador de usuarios.
+ * Luego, llama al callback proporcionado con el controlador, la solicitud y la respuesta como argumentos.
+ * 
+ * @function withController
+ * @param {function} callback - La función callback que será llamada con el controlador, la solicitud y la respuesta.
+ * @returns {function} Una función que toma `req` y `res` como argumentos y ejecuta el callback con el controlador, `req` y `res`.
+ */
 const withController = (callback) => {
     return (req, res) => {
         const dao = new FactoryDAO().getUserDao();
@@ -29,7 +39,6 @@ class SessionsRouter extends Router {
 
         // Local: Register 
         this.post('/register', [PUBLIC], (async (req, res, next) => {
-            console.log(req.body);
             next();
         }), passport.authenticate('register', { failureRedirect: '/api/sessions/failregister' }),
             async (req, res) => {
@@ -45,7 +54,6 @@ class SessionsRouter extends Router {
             async (req, res) => {
                 const user = req.user;
 
-                console.log(user);
                 // Generamos un TOKEN JWT con {id, email, role}
                 const credentials = { id: user._id.toString(), email: user.email, role: user.role } // jwt_payload
                 const accessToken = generateToken(credentials)
@@ -57,6 +65,12 @@ class SessionsRouter extends Router {
         this.get('/faillogin', [PUBLIC], (_, res) => {
             res.sendError(400, 'Login fail');
         })
+
+        // Envia mail para restablecer pwd 
+        this.post('/sendEmailResetPassword', [PUBLIC], withController((controller, req, res) => controller.sendEmailResetPassword(req, res)))
+
+        // Restablece la password
+        this.post('/resetPassword/:tid', [PUBLIC], verifyPassToken, withController((controller, req, res) => controller.resetPassword(req, res)))
 
         // Logout
         this.get('/logout', [PUBLIC], (req, res) => {
@@ -78,6 +92,9 @@ class SessionsRouter extends Router {
         this.get('/status', (req, res) => {
             res.send('ok');
         })
+
+        // User Premium: Cambia el rol de un usuario de "user" -> "premium"
+        this.get('/premium/:id', [PUBLIC], withController((controller, req, res) => controller.turnPremiumRole(req,res)));
     }
 }
 module.exports = {

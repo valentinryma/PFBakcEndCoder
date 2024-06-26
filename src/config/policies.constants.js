@@ -2,6 +2,6 @@ module.exports = {
     PUBLIC: 'public',
     AUTHENTICATED: 'authenticated',
     USER: 'user',
-    USER_PREMIUM: 'user_premium',
+    PREMIUM: 'premium',
     ADMIN: 'admin',
 }
