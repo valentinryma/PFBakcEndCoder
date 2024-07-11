@@ -30,11 +30,11 @@ class ProductsRouter extends Router {
     init() {
         this.get('/', withController((controller, req, res) => controller.getAll(req, res)));
 
-        // this.get('/:id', withController((controller, req, res) => controller.getById(req, res)));
+        this.get('/:pid', withController((controller, req, res) => controller.getById(req, res)));
 
-        // this.post('/', withController((controller, req, res) => controller.create(req, res)));
+        this.post('/', withController((controller, req, res) => controller.create(req, res)));
 
-        // this.delete('/:id', withController((controller, req, res) => controller.deleteById(req, res)));
+        this.delete('/:pid', withController((controller, req, res) => controller.deleteById(req, res)));
     };
 };
 

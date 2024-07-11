@@ -23,8 +23,8 @@ class BaseRouter {
         this.router.put(path, this.customizeCallback(callbacks));
     };
 
-    delte(path, ...callbacks) {
-        this.router.delte(path, this.customizeCallback(callbacks));
+    delete(path, ...callbacks) {
+        this.router.delete(path, this.customizeCallback(callbacks));
     };
 
     customizeCallback(callbacks) {

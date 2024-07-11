@@ -15,6 +15,39 @@ paths:
                   $ref: "#components/schemas/Product"
         "500":
           description: Error en el servidor
+      parameters:
+        - in: query
+          name: title
+          schema:
+            type: string
+          required: false
+          description: Filtro por titulo
+        - in: query
+          name: status
+          schema:
+            type: string
+          required: false
+          description: Filtro por status (true - false)
+        - in: query
+          name: limit
+          schema:
+            type: number
+          required: false
+          description: Limita el numero de resultados
+        - in: query
+          name: page
+          schema:
+            type: number
+          required: false
+          description: Numero de paginación.
+        # TODO: Arreglar sort en product repository.
+        # - in: query
+        #   name: sort
+        #   schema:
+        #     type: string
+        #   required: false
+        #   description: Filtro por status (true - false)
+    
 
 components:
   schemas:
@@ -33,6 +66,9 @@ components:
         code:
           type: String
           description: Codigo unico del producto
+        status:
+          type: Boolean
+          description: Disponibilidad del producto
         stock:
           type: Number
           description: Stock del producto - (Cantidad de unidades)

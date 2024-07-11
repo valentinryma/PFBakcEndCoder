@@ -3,7 +3,7 @@
 // - TODO: Mejorar comentarios.
 // - TODO: Modificar sort, para que se pueda ordenar por x campo
 
-const dto = require('../dtos/users.dto.js');
+const dto = require('../dtos/products.dto.js');
 
 const { getDTO } = require('../utils/main.utils.js');
 
@@ -37,7 +37,7 @@ class ProductsRepository {
 
         if (category) conditions.push({ category });
 
-        if (category) conditions.push({ status });
+        if (status) conditions.push({ status });
 
         // Consulta final & Opciones.
         const query = conditions.length > 0
@@ -51,18 +51,45 @@ class ProductsRepository {
             sort: null
         }
 
-        // TODO: Verificar si funciona - Mejorar para que pueda utilizar otros campos ademas de price.
-        if (sort) paginateOptions.sort = {
-            sort: { price: + sort }
-        };
+        // TODO: Arreglar! No anda.
+        // if (sort) paginateOptions.sort = {
+        //     sort: { price: +sort }
+        // };
 
         const products = await this.dao.getAll(query, paginateOptions);
 
-        products.payload = getDTO(products, this.dto);
+        products.payload = getDTO(products.docs, this.dto);
 
         delete products.docs;
 
         return products;
+    };
+
+    // Toggle DTO in Object config.
+    async getById(pid, config = null) {
+        // TODO: Validar Id's - errorHandler - Logger
+        const product = await this.dao.getById(pid);
+
+        if (!product) {
+            // TODO: CustomError
+            return [];
+        };
+
+        if (config?.useDto) {
+            return new dto(product);
+        };
+
+        return product;
+    };
+
+    async create(product) {
+        const newProduct = await this.dao.create(product);
+
+        return await new dto(newProduct);
+    };
+
+    async deleteById(pid) {
+        return await this.dao.deleteById(pid);
     };
 };
 

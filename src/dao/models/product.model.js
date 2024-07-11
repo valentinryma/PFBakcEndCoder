@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const mongoosePaginate = require('mongoose-paginate-v2');
 
-const collection = 'products';
+const collection = 'product';
 
 const schema = new mongoose.Schema(
     {
@@ -12,7 +12,7 @@ const schema = new mongoose.Schema(
 
         code: { type: String, require: true },
 
-        status: { type: String, require: true },
+        status: { type: Boolean, require: true },
 
         stock: { type: Number, require: true },
 
@@ -20,13 +20,14 @@ const schema = new mongoose.Schema(
 
         thumbnails: [{ type: String, require: false }],
 
-        owner: { type: String, require: true },
+        owner: { type: mongoose.Types.ObjectId, require: true },
     }
 );
 
-schema.virtual('id').get(function () {
-    return this._id.toString();
-})
+// schema.virtual('id').get(function () {
+//     return this._id.toString();
+// });
 
 schema.plugin(mongoosePaginate);
+
 module.exports = mongoose.model('Product', schema, collection);

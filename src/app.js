@@ -17,7 +17,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const routes = [
-    require('./routes/products.router.js')
+    require('./routes/products.router.js'),
+    require('./routes/carts.router.js'),
 ];
 
 routes.forEach(

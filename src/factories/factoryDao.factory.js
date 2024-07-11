@@ -10,7 +10,10 @@ const PERSISTENCE = getPersistenceMethod();
 const loadDAOs = (PERSISTENCE) => {
     switch (PERSISTENCE) {
         case 'MONGO_DB':
-            return new mongoDAOs.ProductsMongoDAO();
+            return {
+                ProductDAO: new mongoDAOs.ProductsMongoDAO(),
+                CartDAO: new mongoDAOs.CartsMongoDAO(),
+            };
 
         case 'FILE':
             break;
@@ -21,14 +24,16 @@ const loadDAOs = (PERSISTENCE) => {
     };
 };
 
-const ProductDAO = loadDAOs(PERSISTENCE);
+const { ProductDAO, CartDAO } = loadDAOs(PERSISTENCE);
 
 class FactoryDAO {
     constructor() {
         this.productDAO = ProductDAO;
+        this.cartDAO = CartDAO;
     }
 
     getProductDao() { return this.productDAO; };
+    getCartDao() { return this.cartDAO; };
 }
 
 
