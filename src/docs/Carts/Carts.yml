@@ -1,36 +1,9 @@
-# TODO: requestBody del post /api/products
-
 paths:
-  /api/products:
+  /api/carts:
     get:
-      summary: Devuelve todos los productos, incluye filtros
+      summary: Devuelve todos los carritos
       tags:
-        - Products
-      parameters:
-        - in: query
-          name: title
-          schema:
-            type: string
-          required: false
-          description: Filtro por título
-        - in: query
-          name: status
-          schema:
-            type: string
-          required: false
-          description: Filtro por estado (true - false)
-        - in: query
-          name: limit
-          schema:
-            type: number
-          required: false
-          description: Límite del número de resultados
-        - in: query
-          name: page
-          schema:
-            type: number
-          required: false
-          description: Número de paginación
+        - Carts
       responses:
         "200":
           description: Operación resuelta con éxito
@@ -39,33 +12,20 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Product'
-        "400":
-          description: Solicitud incorrecta
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BadRequest'
+                  $ref: '#/components/schemas/Cart'
         "500":
           description: Error en el servidor
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ServerError'
-
     post:
-      summary: Crea un nuevo producto
+      summary: Crea un nuevo carrito vacío
       tags:
-        - Products
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/requestBodies/Product'
+        - Carts
       responses:
         "201":
-          description: Producto creado exitosamente
+          description: Carrito creado exitosamente
           content:
             application/json:
               schema:
@@ -83,62 +43,92 @@ paths:
               schema:
                 $ref: '#/components/schemas/ServerError'
 
-  /api/products/{id}:
+  /api/carts/{id}:
     get:
-      summary: Devuelve un producto por ID
+      summary: Devuelve un carrito por ID
       tags:
-        - Products
+        - Carts
       parameters:
         - name: id
           in: path
           required: true
-          description: ID del producto
+          description: ID del carrito
           schema:
             type: string
       responses:
         "200":
-          description: Operación exitosa, devuelve el producto encontrado
+          description: Operación exitosa, devuelve el carrito encontrado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Product'
+                $ref: '#/components/schemas/Cart'
         "404":
-          description: Producto no encontrado
+          description: Carrito no encontrado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProductNotFound'
+                $ref: '#/components/schemas/CartNotFound'
         "500":
           description: Error en el servidor
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ServerError'
-    
     delete:
-      summary: Elimina un producto por ID
+      summary: Elimina un carrito por ID
       tags:
-        - Products
+        - Carts
       parameters:
         - name: id
           in: path
           required: true
-          description: ID del producto
+          description: ID del carrito
           schema:
             type: string
       responses:
         "204":
-          description: Producto eliminado exitosamente, sin contenido
+          description: Carrito eliminado exitosamente, sin contenido
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/NoContent'
         "404":
-          description: Producto no encontrado
+          description: Carrito no encontrado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProductNotFound'
+                $ref: '#/components/schemas/CartNotFound'
+        "500":
+          description: Error en el servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+
+  /api/carts/{cid}/product/{pid}:
+    post:
+      summary: Agrega un producto en un carrito.
+      tags:
+        - Carts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requestBodies/Product'
+      responses:
+        "201":
+          description: Operación exitosa, Producto creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        "400":
+          description: Solicitud incorrecta
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         "500":
           description: Error en el servidor
           content:
@@ -148,49 +138,31 @@ paths:
 
 components:
   schemas:
-    Product:
+    Cart:
       type: object
       properties:
         id:
           type: string
-          description: ID del producto (generado por MongoDB)
-        title:
-          type: string
-          description: Título del producto
-        price:
-          type: number
-          description: Precio del producto
-        code:
-          type: string
-          description: Código único del producto
-        status:
-          type: boolean
-          description: Disponibilidad del producto
-        stock:
-          type: number
-          description: Stock del producto (cantidad de unidades)
-        category:
-          type: string
-          description: Categoría del producto
-        owner:
-          type: string
-          description: ID del creador del producto (generado por MongoDB)
-        thumbnails:
+          description: ID del carrito (generado por MongoDB)
+        products:
           type: array
           items:
-            type: string
+            type: object
+            properties:
+              id: 
+                type: string
+                description: ID del producto
+              quantity: 
+                type: number
+                description: Cantidad del producto
       example:
-        id: "663bfc3d74aa17e7412cf919"
-        title: "Smartphone"
-        price: 29388
-        code: "ABC123"
-        status: true
-        stock: 2
-        category: "electronics"
-        owner: "664a5c70db6a15f01754bd6b"
-        thumbnails:
-          - "https://http2.mlstatic.com/D_NQ_NP_677855-MLA71570451917_092023-O.webp"
-
+        id: "668dbc4163c6af4a73c7d549"
+        products:
+          - id: "668dbc0063c6af4a73c7d541"
+            quantity: 3
+          - id: "668dbc4263c6af4a73c7d54b"
+            quantity: 6
+    
     Success:
       type: object
       properties:
@@ -209,9 +181,9 @@ components:
           type: string
       example:
         status: "error"
-        message: "Bad Request"
+        message: "Solicitud incorrecta"
 
-    ProductNotFound:
+    CartNotFound:
       type: object
       properties:
         status:
@@ -220,7 +192,7 @@ components:
           type: string
       example:
         status: "error"
-        message: "Product not found"
+        message: "Carrito no encontrado"
 
     ServerError:
       type: object
@@ -231,17 +203,19 @@ components:
           type: string
       example:
         status: "error"
-        message: "Internal Server Error"
+        message: "Error en el servidor"
 
     NoContent:
       type: object
       properties:
         status:
           type: string
+          description: Mensaje de confirmación para respuestas sin contenido
         message:
           type: string
       example:
         status: "success"
+        message: "No Content"
 
   requestBodies:
     Product:
