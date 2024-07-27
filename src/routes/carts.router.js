@@ -4,9 +4,11 @@ const Router = require('./router');
 
 const { FactoryDAO } = require('../factories/factoryDao.factory.js');
 
-const { CartsController } = require('../controllers/carts.controller.js');
+const { CartsController } = require('../controllers/apiControllers/carts.controller.js');
 
 const { CartsRepository } = require('../services/carts.repository.js');
+
+const { USER, PUBLIC, ADMIN, PREMIUM } = require('./policies.constants.js');
 
 /**
  * Función de orden superior que crea e inicializa un controlador y luego invoca la función de callback proporcionada.
@@ -30,31 +32,42 @@ class CartsRouter extends Router {
     init() {
         // GET
 
-        this.get('/', withController((controller, req, res) => controller.getAll(req, res)));
+        this.get('/',
+            [PUBLIC],
+            withController((controller, req, res) => controller.getAll(req, res)));
 
-        this.get('/:cid', withController((controller, req, res) => controller.getById(req, res)));
+        this.get('/:cid',
+            [PUBLIC],
+            withController((controller, req, res) => controller.getById(req, res)));
 
         // POST        
 
-        this.post('/', withController((controller, req, res) => controller.create(req, res)));
+        this.post('/',
+            [PUBLIC],
+            withController((controller, req, res) => controller.create(req, res)));
 
-        this.post('/:cid/product/:pid', withController((controller, req, res) => controller.addProduct(req, res)));
+        this.post('/:cid/product/:pid',
+            [PUBLIC],
+            withController((controller, req, res) => controller.addProduct(req, res)));
 
         // TODO: ESTA RUTA
-        // this.post('/:cid/purcharse', withController((controller, req, res) => controller.purschase(req, res)))
+        // this.post('/:cid/purcharse', [PUBLIC], withController((controller, req, res) => controller.purschase(req, res)))
 
         // DELTE
 
-        this.delete('/:cid', withController((controller, req, res) => controller.deleteById(req, res)))
+        this.delete('/:cid',
+            [PUBLIC],
+            withController((controller, req, res) => controller.deleteById(req, res)))
 
-        this.delete('/:cid/product/:pid', withController((controller, req, res) => controller.removeProduct(req, res)))
+        this.delete('/:cid/product/:pid',
+            [PUBLIC],
+            withController((controller, req, res) => controller.removeProduct(req, res)))
 
         // PUT
 
-        // this.put('/:cid', withController((controller, req, res) => controller.updateCart(req, res)))
+        // this.put('/:cid', [PUBLIC], withController((controller, req, res) => controller.updateCart(req, res)))
 
-        // this.put('/:cid/product/:pid', withController((controller, req, res) => controller.updateProduct(req, res)))
-
+        // this.put('/:cid/product/:pid', [PUBLIC], withController((controller, req, res) => controller.updateProduct(req, res)))
     };
 };
 

@@ -3,7 +3,7 @@
 //! TODO: Terminar rutas
 //! TODO: Revisar seguridad - No se esta validnado req.query (filters)
 
-const { areValidId, validateShcema } = require('../utils/main.utils');
+const { areValidId, validateShcema } = require('../../utils/main.utils');
 
 const Joi = require('joi');
 
@@ -35,7 +35,7 @@ class ProductsController {
 
         const results = await this.repository.getAll(filters)
 
-        return res.json({ status: "success", payload: results.payload });
+        return res.sendSuccessJSON(results.payload);
     };
 
     async getById(req, res) {
@@ -48,18 +48,18 @@ class ProductsController {
 
         const product = await this.repository.getById(pid, { useDto: true });
 
-        res.json({ status: "success", payload: product });
+        return res.sendSuccessJSON(product);
     };
 
     async create(req, res) {
         // TODO: JOI para validar los req.body
 
-        // Ver si isValidReques es conviente pasarlo a un middleware
+        // Ver si isValidRequest es conviente pasarlo a un middleware
         validateShcema(validateProductSchema, req, res);
 
         const newProduct = await this.repository.create(req.body);
 
-        return res.json({ status: "success", payload: newProduct });
+        return res.sendSuccessJSON(newProduct);
     };
 
     async deleteById(req, res) {
@@ -72,7 +72,7 @@ class ProductsController {
 
         await this.repository.deleteById(pid);
 
-        res.json({ status: "success" });
+        return res.sendSuccessJSON({ productUpdate: pid });
     };
 };
 

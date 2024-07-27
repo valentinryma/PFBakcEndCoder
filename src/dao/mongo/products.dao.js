@@ -16,13 +16,15 @@ class ProductsMongoDAO {
     };
 
     async getAll(query, options) {
-        const products = await ProductModel.paginate(query, options);
-
-        return products;
+        return await ProductModel.paginate(query, options);
     };
 
     async getById(pid) {
-        return await ProductModel.findById(pid);
+        const product = await ProductModel.findById(pid);
+
+        if (!product) {
+            throw new Error('user not found');
+        }
 
     };
 

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const mongoosePaginate = require('mongoose-paginate-v2');
 
-const collection = 'product';
+const collection = 'products';
 
 const schema = new mongoose.Schema(
     {

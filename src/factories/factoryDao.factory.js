@@ -13,6 +13,7 @@ const loadDAOs = (PERSISTENCE) => {
             return {
                 ProductDAO: new mongoDAOs.ProductsMongoDAO(),
                 CartDAO: new mongoDAOs.CartsMongoDAO(),
+                UserDAO: new mongoDAOs.UsersMongoDAO()
             };
 
         case 'FILE':
@@ -24,16 +25,24 @@ const loadDAOs = (PERSISTENCE) => {
     };
 };
 
-const { ProductDAO, CartDAO } = loadDAOs(PERSISTENCE);
+const {
+    ProductDAO,
+    CartDAO,
+    UserDAO
+} = loadDAOs(PERSISTENCE);
 
 class FactoryDAO {
     constructor() {
         this.productDAO = ProductDAO;
         this.cartDAO = CartDAO;
+        this.userDAO = UserDAO;
     }
 
     getProductDao() { return this.productDAO; };
+
     getCartDao() { return this.cartDAO; };
+
+    getUserDao() { return this.userDAO; };
 }
 
 

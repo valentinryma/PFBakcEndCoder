@@ -1,4 +1,4 @@
-const { areValidId, validateShcema } = require('../utils/main.utils');
+const { areValidId, validateShcema } = require('../../utils/main.utils');
 
 class CartsController {
     constructor(service) {
@@ -8,7 +8,7 @@ class CartsController {
     async getAll(_, res) {
         const carts = await this.service.getAll();
 
-        return res.json({ status: "success", payload: carts });
+        return res.sendSuccessJSON(carts);
     };
 
     async getById(req, res) {
@@ -20,14 +20,14 @@ class CartsController {
 
         const cart = await this.service.getById(cid);
 
-        res.json({ status: "success", payload: cart });
+        return res.sendSuccessJSON(cart);
     };
 
     async create(_, res) {
         // Todo Retornar en la res.json el id del cart empty creado.
         const newCart = await this.service.create();
 
-        return res.json({ status: "success", payload: newCart });
+        return res.sendSuccessJSON(newCart);
     };
 
     async addProduct(req, res) {
@@ -41,7 +41,7 @@ class CartsController {
 
         const cartUpdate = await this.service.addProduct(cid, pid, quantity);
 
-        return res.json({ status: "success", payload: cartUpdate });
+        return res.sendSuccessJSON(cartUpdate);
     };
 
     async removeProduct(req, res) {
@@ -53,7 +53,7 @@ class CartsController {
 
         await this.service.removeProduct(cid, pid);
 
-        return res.json({ status: "success" });
+        return res.sendSuccessJSON({ cartUpdate: cid });
     };
 
     async deleteById(req, res) {
@@ -65,7 +65,7 @@ class CartsController {
 
         await this.service.deleteById(cid);
 
-        res.json({ status: "success" });
+        return res.sendSuccessJSON({ cartUpdate: cid });
     };
 };
 

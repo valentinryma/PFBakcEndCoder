@@ -6,8 +6,9 @@ const { FactoryDAO } = require('../factories/factoryDao.factory.js');
 
 const { ProductsRepository } = require('../services/products.repository.js');
 
-const { ProductsController } = require('../controllers/products.controller.js');
+const { ProductsController } = require('../controllers/apiControllers/products.controller.js');
 
+const { USER, PUBLIC, ADMIN, PREMIUM } = require('./policies.constants.js');
 /**
  * Función de orden superior que crea e inicializa un controlador y luego invoca la función de callback proporcionada.
  *
@@ -28,13 +29,22 @@ const withController = (callback) => {
 
 class ProductsRouter extends Router {
     init() {
-        this.get('/', withController((controller, req, res) => controller.getAll(req, res)));
+        this.get(
+            '/',
+            [PUBLIC],
+            withController((controller, req, res) => controller.getAll(req, res)));
 
-        this.get('/:pid', withController((controller, req, res) => controller.getById(req, res)));
+        this.get('/:pid',
+            [PUBLIC],
+            withController((controller, req, res) => controller.getById(req, res)));
 
-        this.post('/', withController((controller, req, res) => controller.create(req, res)));
+        this.post('/',
+            [ADMIN],
+            withController((controller, req, res) => controller.create(req, res)));
 
-        this.delete('/:pid', withController((controller, req, res) => controller.deleteById(req, res)));
+        this.delete('/:pid',
+            [ADMIN],
+            withController((controller, req, res) => controller.deleteById(req, res)));
     };
 };
 

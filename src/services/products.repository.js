@@ -62,6 +62,8 @@ class ProductsRepository {
 
         delete products.docs;
 
+        console.log(products);
+
         return products;
     };
 
@@ -89,6 +91,8 @@ class ProductsRepository {
     };
 
     async deleteById(pid) {
+        // TODO: Si el user es premium, enviar notificación via mail.
+
         return await this.dao.deleteById(pid);
     };
 };
