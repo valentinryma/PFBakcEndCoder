@@ -62,8 +62,6 @@ class ProductsRepository {
 
         delete products.docs;
 
-        console.log(products);
-
         return products;
     };
 

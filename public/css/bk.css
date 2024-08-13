@@ -1,0 +1,105 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Navbar Styling */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background-color: #003049; /* Color de fondo del navbar */
+    color: #FDF0D5; /* Color del texto en el navbar */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra sutil para el navbar */
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+.nav-links a {
+    color: #FDF0D5; /* Color del enlace */
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease; /* Transición suave para el hover */
+}
+
+.nav-links a:hover {
+    color: #C1121F; /* Color del enlace al pasar el ratón */
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Product List Styling */
+.product-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+    background-color: #FDF0D5; /* Fondo del listado de productos */
+}
+
+/* Card Styling */
+.product-card {
+    border: 1px solid #669BBC; /* Borde de la card */
+    border-radius: 12px; /* Bordes redondeados más elegantes */
+    padding: 20px;
+    max-width: 300px;
+    flex: 1 1 calc(33.333% - 40px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #fff; /* Fondo blanco para la card */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil para la card */
+    transition: box-shadow 0.3s ease, transform 0.3s ease; /* Transición para hover */
+}
+
+.product-card img {
+    max-width: 100%;
+    border-radius: 8px; /* Bordes redondeados en la imagen */
+}
+
+.product-card h2 {
+    margin: 15px 0 10px;
+    color: #003049; /* Color del título */
+    font-size: 20px;
+}
+
+.product-card p {
+    margin: 5px 0;
+    color: #003049; /* Color del texto */
+}
+
+.product-card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Sombra más prominente en hover */
+    transform: translateY(-5px); /* Elevación en hover */
+}
+
+.product-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.product-buttons button {
+    padding: 10px 15px;
+    background-color: #C1121F; /* Color de fondo del botón */
+    border: none;
+    color: #FDF0D5; /* Color del texto del botón */
+    border-radius: 8px; /* Bordes redondeados en el botón */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Transición suave */
+}
+
+.product-buttons button:hover {
+    background-color: #780000; /* Color de fondo al pasar el ratón */
+    transform: scale(1.05); /* Escala en hover */
+}

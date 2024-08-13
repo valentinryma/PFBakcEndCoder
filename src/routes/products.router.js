@@ -49,5 +49,6 @@ class ProductsRouter extends Router {
 };
 
 module.exports = {
-    configure: (app) => app.use('/api/products', new ProductsRouter().getRouter())
+    configure: (app) => app.use('/api/products', new ProductsRouter().getRouter()),
+    productWithController: withController
 };

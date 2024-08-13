@@ -1,0 +1,62 @@
+<header class="navbar">
+    <ul class="nav-links">
+        <li><a href="#">Menu Secundario</a></li>
+
+        <img src="#" alt="logo ecommerce" >
+    </ul>
+    
+    <ul class="nav-links">
+        <li><a href="#">Home</a></li>
+
+        <li><a href="#">About</a></li>
+
+        <li><a href="#">Contact</a></li>
+    </ul>
+</header>
+
+<main>
+    <section class="product-list" data-component="" data-url="/api/carts">
+        {{#each products }}
+        {{!-- {{$if status}} --}}
+            <div class="product-card">
+                <img src="{{thumbnails.[0]}}" alt="image of {{title}}">
+
+                <h2>{{title}}</h2>
+
+                {{#if status}}
+                    <p>Status: Available</p>
+                {{else}}
+                    <p>Status: Not available</p>
+                {{/if}}
+                
+                <p>Price: ${{price}}</p>
+
+                <div class="product-buttons" data-buy-conetainer="">
+                    {{#if ../isLoggedIn}}
+                        {{#if status }}
+                            <button 
+                                data-cart-id="{{../cartId}}",
+                                data-product-id="{{id}}" 
+                                data-buy-btn=""
+                                data-action="buy"
+                            >
+                                Buy
+                            </button>
+
+                            <button>view details</button>
+                        {{else}}
+                            <button>No available</button>
+                        {{/if}}
+                    {{else}}
+                        <button 
+                                data-buy-btn=""
+                                data-action="login"
+                            >
+                            Login to buy
+                        </button>
+                    {{/if}}
+                </div>
+            </div>
+        {{/each}}
+    </section>
+</main>
