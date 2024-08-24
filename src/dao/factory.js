@@ -1,4 +1,4 @@
-const persistence = (process.env.PERSISTENCE || process.argv.PERSISTENCE) || 'MONGO' // Default
+const persistence = (process.env.PERSISTENCE || process.argv.PERSISTENCE) || 'MONGO'
 
 let ProductsDAO = null
 let CartsDAO = null
@@ -6,15 +6,23 @@ let UsersDAO = null
 let TicketsDAO = null
 
 if (persistence === 'MONGO') {
+    // loggear en show extras
     console.log(`- Metodo de Persistencia: ${persistence}`)
+
     const { ProductsMongoDAO } = require(`${__dirname}/daos/mongo/products.dao.js`);
+
     const { CartsMongoDAO } = require(`${__dirname}/daos/mongo/carts.dao.js`);
+
     const { UsersMongoDAO } = require(`${__dirname}/daos/mongo/users.dao.js`);
+
     const { TicketsMongoDAO } = require(`${__dirname}/daos/mongo/tickets.dao.js`);
 
     ProductsDAO = new ProductsMongoDAO();
+
     CartsDAO = new CartsMongoDAO();
+
     UsersDAO = new UsersMongoDAO();
+
     TicketsDAO = new TicketsMongoDAO();
 
 } else if (persistence === 'FILE') {

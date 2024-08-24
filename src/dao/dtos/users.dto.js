@@ -5,7 +5,6 @@ class UserDTO {
         this.age = user.age;
         this.email = user.email;
         this.id = user._id.toString();
-        this.message = 'Formateado desde DTO!'
     }
 }
 

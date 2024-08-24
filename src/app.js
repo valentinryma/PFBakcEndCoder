@@ -7,6 +7,7 @@ const handlebars = require('express-handlebars');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const cookieParser = require('cookie-parser');
+const { serve, setup } = require('./docs/openapi.js');
 
 const app = express();
 
@@ -26,6 +27,9 @@ const sessionMiddleware = require(`${__dirname}/sessions/mongoStorage.js`);
 
 // Error Logger - winston
 app.use(useLogger);
+
+// Documentación
+app.use('/apidocs', serve, setup);
 
 // Handlebars Config.
 app.engine('handlebars', handlebars.engine())
@@ -55,17 +59,18 @@ app.use(passport.session())
 
 // Routers
 const routes = [
-    require(`${__dirname}/routes/products.router.js`), // Products - Router
-    require(`${__dirname}/routes/sessions.router.js`), // Sessions - Router
-    require(`${__dirname}/routes/carts.router.js`),    // Carts  - Router
-    require(`${__dirname}/routes/views.router.js`),    // Views  - Router
-    require(`${__dirname}/routes/mocks.router.js`),    // Mocks  - Router
-    require(`${__dirname}/routes/logger.router.js`),   // Logger - Router
+    require(`${__dirname}/routes/products.router.js`),
+    require(`${__dirname}/routes/sessions.router.js`),
+    require(`${__dirname}/routes/carts.router.js`),
+    require(`${__dirname}/routes/views.router.js`),
+    require(`${__dirname}/routes/mocks.router.js`),
+    require(`${__dirname}/routes/logger.router.js`),
+    require(`${__dirname}/routes/users.router.js`),
 ];
 
 for (const route of routes) {
     route.configure(app);
-}
+};
 
 app.use(errorHandler);
 
@@ -77,7 +82,7 @@ const main = async () => {
         const dbName = process.env.DB_NAME;
 
         await mongoose.connect(mongoUrl, { dbName })
-    }
+    };
 
     // HTTP Server on.
     const PORT = process.env.PORT || 8080

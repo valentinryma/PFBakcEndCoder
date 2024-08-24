@@ -4,7 +4,7 @@ const { PUBLIC } = require(`../config/policies.constants.js`);
 
 const { getURL } = require(`../utils/utils.js`);
 const { generateToken, verifyPassToken } = require(`../utils/jwt.js`);
-const { UserDTO } = require('../dao/DTOs/users.dto.js');
+const { UserDTO } = require('../dao/dtos/users.dto.js');
 
 const { FactoryDAO } = require(`../dao/factory.js`);
 const { UsersRepository } = require(`../services/users/users.repository.js`);
@@ -92,9 +92,6 @@ class SessionsRouter extends Router {
         this.get('/status', (req, res) => {
             res.send('ok');
         })
-
-        // User Premium: Cambia el rol de un usuario de "user" -> "premium"
-        this.get('/premium/:id', [PUBLIC], withController((controller, req, res) => controller.turnPremiumRole(req,res)));
     }
 }
 module.exports = {

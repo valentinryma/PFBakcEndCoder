@@ -14,6 +14,8 @@ const initializeStrategy = () => {
         try {
             // en jwt_payload.user viene de 'credentials' en el router login.
             const user = jwt_payload.user
+            console.log(user);
+
             return done(null, user);
         } catch (error) {
             return done(error);

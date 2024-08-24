@@ -3,9 +3,15 @@ class UsersController {
         this.service = service;
     }
 
+    async getAll(_, res) {
+        const users = await this.service.getAll();
+        res.sendSuccess({ users });
+    }
+
     async getById(req, res) {
         const uid = req.params.uid;
         const user = await this.service.getById(uid);
+        res.sendSuccess({ user });
     }
 
     async getByIdFormat(req, res) {
@@ -14,7 +20,6 @@ class UsersController {
         res.sendSuccess({ user });
 
     }
-
 
     async sendEmailResetPassword(req, res) {
         const email = req.body.email;

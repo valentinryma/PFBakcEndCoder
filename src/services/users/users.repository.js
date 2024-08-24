@@ -11,6 +11,12 @@ class UsersRepository {
         this.dto = dto;
     }
 
+    async getAll() {
+        const results = await this.dao.getAll();
+        return results
+        return results.map(r => { new this.dto(r) });
+    }
+
     async getById(id) {
         return await this.dao.getById(id);
     }

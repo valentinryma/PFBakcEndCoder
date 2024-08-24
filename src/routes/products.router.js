@@ -1,9 +1,11 @@
 const Router = require(`${__dirname}/router.js`);
+
 const { PUBLIC, ADMIN, USER, PREMIUM } = require(`${__dirname}/../config/policies.constants.js`);
 
 const { FactoryDAO } = require(`${__dirname}/../dao/factory.js`);
 
 const { ProductsRepository } = require(`${__dirname}/../services/products/products.repository.js`);
+
 const { ProductsController } = require(`${__dirname}/../controllers/products.controller`)
 
 const withController = (callback) => {

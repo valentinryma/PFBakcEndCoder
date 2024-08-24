@@ -11,6 +11,11 @@ class UsersMongoDAO {
         }
     }
 
+    async getAll() {
+        const users = await UserModel.find();
+        return users;
+    }
+
     async getById(id) {
         const user = await UserModel.findOne({ _id: id });
         if (!user) throw new Error('user not found');
