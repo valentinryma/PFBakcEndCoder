@@ -13,7 +13,7 @@ class ViewController {
             scripts: ['products.js'],
             styles: ['main.css'],
             products: products.payload,
-            isLoggedIn: true,
+            isLoggedIn: false,
             cartId: '669ef32f059e135f5da140ad',
             useSweetAlert: true,
             useJquery: true,

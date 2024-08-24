@@ -9,9 +9,9 @@ const express = require('express');
 
 const handlebars = require('express-handlebars');
 
-const mongoose = require('mongoose');
+const { serve, setup } = require('./docs/openapi');
 
-const { serve, setup } = require('./docs/openapi.js');
+const mongoose = require('mongoose');
 
 const app = express();
 
